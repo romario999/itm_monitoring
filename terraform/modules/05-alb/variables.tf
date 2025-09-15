@@ -33,3 +33,13 @@ variable "web_ui_port" {
   description = "Port for Web UI service"
   type        = number
 }
+
+variable "prometheus_port" {
+  description = "Port for Prometheus service"
+  type        = number
+}
+
+variable "grafana_port" {
+  description = "Port for Grafana service"
+  type        = number
+}

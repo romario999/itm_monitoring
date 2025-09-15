@@ -54,9 +54,7 @@ module "ec2" {
   prometheus_port             = var.prometheus_port
   grafana_port                = var.grafana_port
   port                        = each.key == "react" ? var.web_ui_port : (each.key == "dotnet" ? var.web_backend_port : (each.key == "angular" ? var.web_ui_port : (each.key == "prometheus" ? var.prometheus_port : (each.key == "grafana" ? var.grafana_port : 80))))
-  # TODO ----
-  target_group_arn            = each.key == "angular" ? module.alb.web_ui_angular_target_group_arn : (each.key == "react" ? module.alb.web_ui_react_target_group_arn : null)
-  # ----
+  target_group_arn = each.key == "angular" ? module.alb.web_ui_angular_target_group_arn : each.key == "react" ? module.alb.web_ui_react_target_group_arn : each.key == "grafana" ? module.alb.grafana_target_group_arn : each.key == "prometheus" ? module.alb.prometheus_target_group_arn : null
   associate_public_ip_address = each.key != "dotnet"
 
 }
@@ -92,4 +90,6 @@ module "alb" {
   security_group_id = module.security_groups.alb_security_group_id
   web_backend_port  = var.web_backend_port
   web_ui_port       = var.web_ui_port
+  prometheus_port   = var.prometheus_port
+  grafana_port      = var.grafana_port
 }
