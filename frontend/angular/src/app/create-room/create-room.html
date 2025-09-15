@@ -1,0 +1,14 @@
+<app-stepper
+  [stepLabels]="stepLabels"
+  [stepsCount]="stepsCount"
+  [currentStep]="currentStep()"
+/>
+
+@switch (currentStep()) {
+  @case (1) {
+    <app-create-room-form />
+  }
+  @case (2) {
+    <app-add-your-details-form />
+  }
+}
