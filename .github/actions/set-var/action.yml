@@ -38,7 +38,7 @@ runs:
         echo "INSTANCE_NAME=angular" >> $GITHUB_ENV
         echo "CONTEXT=frontend/angular" >> $GITHUB_ENV
         echo "DOCKERFILE=frontend/angular/Dockerfile" >> $GITHUB_ENV
-        echo "REPO=${DOCKER_HUB_USERNAME}/angular" >> $GITHUB_ENV
+        echo "REPO=${{ inputs.docker_hub_username }}/angular" >> $GITHUB_ENV
         
 
     - name: Set Dotnet Environment
@@ -50,4 +50,4 @@ runs:
         echo "INSTANCE_NAME=dotnet" >> $GITHUB_ENV
         echo "CONTEXT=backend/ApiService" >> $GITHUB_ENV
         echo "DOCKERFILE=backend/ApiService/Dockerfile" >> $GITHUB_ENV
-        echo "REPO=${DOCKER_HUB_USERNAME}/dotnet" >> $GITHUB_ENV
+        echo "REPO=${{ inputs.docker_hub_username }}/dotnet" >> $GITHUB_ENV
