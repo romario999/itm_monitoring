@@ -147,7 +147,6 @@ resource "aws_vpc_security_group_ingress_rule" "grafana_ingress" {
   from_port         = var.grafana_port
   to_port           = var.grafana_port
   ip_protocol       = "tcp"
-  cidr_ipv4         = "0.0.0.0/0"
   description       = "Allow access to Grafana"
 }
 
