@@ -24,6 +24,7 @@ module "security_groups" {
   web_ui_port      = var.web_ui_port
   rds_port         = var.rds_port
   prometheus_port  = var.prometheus_port
+  grafana_port     = var.grafana_port
 
   # Access settings
   alb_ingress_ports = var.alb_ingress_ports
