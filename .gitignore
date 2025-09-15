@@ -9,7 +9,6 @@
 
 # Ignore variables files
 .terraform.lock.hcl
-*.tfvars
 *.tfstate*
 *.auto.tfvars
 *.config
