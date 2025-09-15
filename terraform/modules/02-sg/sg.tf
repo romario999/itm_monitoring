@@ -142,6 +142,7 @@ resource "aws_security_group" "grafana" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "grafana_ingress" {
+  security_group_id            = aws_security_group.grafana.id
   referenced_security_group_id = aws_security_group.alb.id
   from_port         = var.grafana_port
   to_port           = var.grafana_port
