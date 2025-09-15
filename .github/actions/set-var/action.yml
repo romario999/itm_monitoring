@@ -4,6 +4,9 @@ inputs:
   microservice:
     description: "Target microservice (react, angular, dotnet)"
     required: true
+  docker_hub_username:
+    description: "Docker Hub username"
+    required: true
 
 runs:
   using: "composite"
