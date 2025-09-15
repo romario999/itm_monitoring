@@ -69,6 +69,11 @@ variable "prometheus_port" {
   type        = number
 }
 
+variable "grafana_port" {
+  description = "Port for Grafana service"
+  type        = number
+}
+
 variable "alb_ingress_ports" {
   description = "Ports to allow on ALB"
   type        = list(number)

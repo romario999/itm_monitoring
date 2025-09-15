@@ -33,6 +33,11 @@ variable "prometheus_port" {
   type        = number
 }
 
+variable "grafana_port" {
+  description = "Port for Grafana service"
+  type        = number
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)

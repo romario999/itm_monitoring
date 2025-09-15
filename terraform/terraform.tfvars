@@ -49,6 +49,7 @@ alb_ingress_ports = [80]
 web_backend_port  = 8080
 web_ui_port       = 3000
 prometheus_port   = 9090
+grafana_port      = 3001
 
 ################################################################################
 # EC2 configuration
@@ -56,7 +57,7 @@ prometheus_port   = 9090
 #Amazon Linux 2023 AMI 2023.8.20250808.1 x86_64 HVM kernel-6.1 in eu-central-1
 
 ami          = "ami-015cbce10f839bd0c"
-ec2_name_set = ["react", "angular", "dotnet", "prometheus"]
+ec2_name_set = ["react", "angular", "dotnet", "prometheus", "grafana"]
 subnet       = ""
 sgs          = []
 iam_role_policies = {

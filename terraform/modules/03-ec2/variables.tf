@@ -136,6 +136,12 @@ variable "prometheus_port" {
   default     = 9090
 }
 
+variable "grafana_port" {
+  description = "Port for Grafana service"
+  type        = number
+  default     = 3001
+}
+
 variable "port" {
   description = "Port for the service"
   type        = number
