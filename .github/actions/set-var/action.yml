@@ -8,17 +8,6 @@ inputs:
     description: "Docker Hub username"
     required: true
 
-outputs:
-  CONTEXT:
-    description: "Docker build context"
-  DOCKERFILE:
-    description: "Dockerfile path"
-  REPO:
-    description: "Docker Hub repo"
-  SHORT_SHA:
-    description: "Short commit SHA"
-
-
 runs:
   using: "composite"
   steps:
