@@ -61,6 +61,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION != '' && secrets.AWS_REGION || 'us-east-1' }}    
 
+      - name: Make EC2 script executable
+        run: chmod +x .github/scripts/get-ec2-instance.sh
+
+
       - name: Get EC2 instance ID
         run: .github/scripts/get-ec2-instance.sh
         shell: bash
