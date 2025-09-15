@@ -99,6 +99,20 @@ resource "aws_vpc_security_group_egress_rule" "web_ui_egress" {
 }
 
 ################################################################################
+# Security Group for Prometheus
+################################################################################
+
+resource "aws_security_group" "prometheus" {
+  name        = "${var.name_prefix}-prometheus-sg"
+  description = "Security group for Prometheus instances"
+  vpc_id      = var.vpc_id
+
+  tags = merge(
+    { Name = "${var.name_prefix}-prometheus-sg" },
+    var.tags
+  )
+}
+
 # Security Group for RDS
 ################################################################################
 

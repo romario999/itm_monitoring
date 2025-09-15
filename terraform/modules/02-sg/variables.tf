@@ -28,6 +28,11 @@ variable "web_ui_port" {
   type        = number
 }
 
+variable "prometheus_port" {
+  description = "Port for Prometheus service"
+  type        = number
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)

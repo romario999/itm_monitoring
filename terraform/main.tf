@@ -23,6 +23,7 @@ module "security_groups" {
   web_backend_port = var.web_backend_port
   web_ui_port      = var.web_ui_port
   rds_port         = var.rds_port
+  prometheus_port  = var.prometheus_port
 
   # Access settings
   alb_ingress_ports = var.alb_ingress_ports
@@ -39,7 +40,7 @@ module "ec2" {
 
   source   = "./modules/03-ec2"
   ami      = var.ami
-  sgs      = each.key == "dotnet" ? [module.security_groups.web_backend_security_group_id] : [module.security_groups.web_ui_security_group_id]
+  sgs      = each.key == "dotnet" ? [module.security_groups.web_backend_security_group_id] : (each.key == "prometheus" ? [module.security_groups.prometheus_security_group_id] : [module.security_groups.web_ui_security_group_id])
   ec2_name = each.key
   #place dotnet(backend) to private subnet
   subnet                      = each.key == "dotnet" ? module.vpc.vpc_subnet_ids["subnet2"] : module.vpc.vpc_subnet_ids["subnet0"]
@@ -49,8 +50,11 @@ module "ec2" {
   iam_role_policies           = var.iam_role_policies
   web_ui_port                 = var.web_ui_port
   web_backend_port            = var.web_backend_port
-  port                        = each.key == "react" ? var.web_ui_port : (each.key == "dotnet" ? var.web_backend_port : (each.key == "angular" ? var.web_ui_port : 80))
+  prometheus_port             = var.prometheus_port
+  port                        = each.key == "react" ? var.web_ui_port : (each.key == "dotnet" ? var.web_backend_port : (each.key == "angular" ? var.web_ui_port : (each.key == "prometheus" ? var.prometheus_port : 80)))
+  # TODO ----
   target_group_arn            = each.key == "angular" ? module.alb.web_ui_angular_target_group_arn : (each.key == "react" ? module.alb.web_ui_react_target_group_arn : null)
+  # ----
   associate_public_ip_address = each.key != "dotnet"
 
 }
