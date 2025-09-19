@@ -53,8 +53,9 @@ jobs:
           tags: |
             ${{ env.REPO }}:latest
             ${{ env.REPO }}:${{ env.SHORT_SHA }}
-    
+
       - name: Notify about successful build
         if: success()
         run: |
           echo "::notice::Successfully built and pushed ${{ inputs.microservice }} image with tags: latest, ${{ steps.vars.outputs.SHORT_SHA }}"
+

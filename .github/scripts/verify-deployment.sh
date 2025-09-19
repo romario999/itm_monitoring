@@ -38,4 +38,3 @@ if [[ "$CONTAINER_STATUS" != *"Up"* ]]; then
   echo "::error::Container is not running properly"
   exit 1
 fi
-

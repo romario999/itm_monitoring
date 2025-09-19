@@ -4,6 +4,7 @@ inputs:
   microservice:
     description: "Target microservice (react, angular, dotnet)"
     required: true
+
   docker_hub_username:
     description: "Docker Hub username"
     required: true
@@ -39,7 +40,6 @@ runs:
         echo "CONTEXT=frontend/angular" >> $GITHUB_ENV
         echo "DOCKERFILE=frontend/angular/Dockerfile" >> $GITHUB_ENV
         echo "REPO=${{ inputs.docker_hub_username }}/angular" >> $GITHUB_ENV
-        
 
     - name: Set Dotnet Environment
       if: ${{ inputs.microservice == 'dotnet' }}

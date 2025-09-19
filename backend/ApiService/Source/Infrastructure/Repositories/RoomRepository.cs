@@ -3,6 +3,8 @@ using AutoMapper;
 using CSharpFunctionalExtensions;
 using Epam.ItMarathon.ApiService.Domain.Abstract;
 using Epam.ItMarathon.ApiService.Domain.Aggregate.Room;
+using Epam.ItMarathon.ApiService.Domain.Entities.User;
+using Epam.ItMarathon.ApiService.Domain.Shared.ValidationErrors;
 using Epam.ItMarathon.ApiService.Infrastructure.Database;
 using Epam.ItMarathon.ApiService.Infrastructure.Database.Models.Room;
 using FluentValidation.Results;
@@ -12,7 +14,6 @@ namespace Epam.ItMarathon.ApiService.Infrastructure.Repositories
 {
     internal class RoomRepository(AppDbContext context, IMapper mapper) : IRoomRepository
     {
-
         public async Task<Result<Room, ValidationResult>> AddAsync(Room item)
         {
             using var transaction = await context.Database.BeginTransactionAsync();
@@ -39,39 +40,95 @@ namespace Epam.ItMarathon.ApiService.Infrastructure.Repositories
             }
         }
 
-        public Task AddManyAsync(IEnumerable<Room> Items)
+        public Task UpdateAsync(Room item)
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(ulong Id)
+        public async Task<Result<Room, ValidationResult>> GetByUserCodeAsync(string userCode)
         {
-            throw new NotImplementedException();
+            var result = await GetByCodeAsync(room => room.Users.Any(user => user.AuthCode == userCode), true);
+            return result;
         }
 
-        public Task DeleteManyAsync(IEnumerable<ulong> Ids)
+        public async Task<Result<Room, ValidationResult>> GetByRoomCodeAsync(string roomCode)
         {
-            throw new NotImplementedException();
+            var result = await GetByCodeAsync(room => room.InvitationCode == roomCode, true);
+            return result;
         }
 
-        public Task<Room?> GetByIdAsync<TItem>(ulong Id, Expression<Func<Room, TItem>>? includeExpression = null)
+        public async Task<Result<User, ValidationResult>> GetUserByUserCode(string userCode, bool includeRoom = false, bool includeWishes = false)
         {
-            throw new NotImplementedException();
+            var userQuery = context.Users.AsQueryable();
+            if (includeRoom)
+            {
+                userQuery = userQuery.Include(user => user.Room);
+            }
+            if (includeWishes)
+            {
+                userQuery = userQuery.Include(user => user.Wishes);
+            }
+
+            var userEf = await userQuery.FirstOrDefaultAsync(user => user.AuthCode.Equals(userCode));
+            var result = userEf == null
+                ? Result.Failure<User, ValidationResult>(new NotFoundError([
+                    new ValidationFailure(nameof(userCode), "User with such code not found")
+                ]))
+                : mapper.Map<User>(userEf);
+            return result;
         }
 
-        public Task<IQueryable<Room>> GetManyAsync<TOrder, TInclude>(Expression<Func<Room, bool>>? filterExpression = null, Expression<Func<Room, TOrder>>? orderExpression = null, Expression<Func<Room, TInclude>>? includeExpression = null, int? items = null)
+        public async Task<Result<User, ValidationResult>> GetUserById(ulong id, bool includeRoom = false, bool includeWishes = false)
         {
-            throw new NotImplementedException();
+            var userQuery = context.Users.AsQueryable();
+            if (includeRoom)
+            {
+                userQuery = userQuery.Include(user => user.Room);
+            }
+            if (includeWishes)
+            {
+                userQuery = userQuery.Include(user => user.Wishes);
+            }
+
+            var userEf = await userQuery.FirstOrDefaultAsync(user => user.Id.Equals(id));
+            var result = userEf == null
+                ? Result.Failure<User, ValidationResult>(new NotFoundError([
+                    new ValidationFailure(nameof(id), "User with such id not found")
+                ]))
+                : mapper.Map<User>(userEf);
+            return result;
         }
 
-        public Task UpdateAsync(Room Item)
+        public async Task<Result<List<User>, ValidationResult>> GetRoomUsersByRoomId(ulong roomId)
         {
-            throw new NotImplementedException();
+            var usersEf = await context.Users
+                .Include(user => user.Room)
+                .Include(user => user.Wishes)
+                .Where(user => user.RoomId == roomId)
+                .ToListAsync();
+            var result = usersEf.Count == 0
+                ? Result.Failure<List<User>, ValidationResult>(new NotFoundError([
+                    new ValidationFailure("roomId", "Room with such id not found0")
+                ]))
+                : mapper.Map<List<User>>(usersEf);
+            return result;
         }
 
-        public Task UpdateManyAsync(IEnumerable<Room> Items)
+        private async Task<Result<Room, ValidationResult>> GetByCodeAsync(Expression<Func<RoomEf, bool>> codeExpression, bool includeUsers = false)
         {
-            throw new NotImplementedException();
+            var roomQuery = context.Rooms.AsQueryable();
+            if (includeUsers)
+            {
+                roomQuery = roomQuery.Include(room => room.Users).ThenInclude(user => user.Wishes);
+            }
+
+            var roomEf = await roomQuery.FirstOrDefaultAsync(codeExpression);
+            var result = roomEf == null
+                ? Result.Failure<Room, ValidationResult>(new NotFoundError([
+                    new ValidationFailure("code", "Room with such code not found")
+                ]))
+                : mapper.Map<Result<Room, ValidationResult>>(roomEf);
+            return result;
         }
     }
 }

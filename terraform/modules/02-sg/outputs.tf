@@ -17,16 +17,6 @@ output "web_ui_security_group_id" {
   value       = try(aws_security_group.web_ui.id, null)
 }
 
-output "prometheus_security_group_id" {
-  description = "ID of the Prometheus security group"
-  value       = try(aws_security_group.prometheus.id, null)
-}
-
-output "grafana_security_group_id" {
-  description = "ID of the Grafana security group"
-  value       = try(aws_security_group.grafana.id, null)
-}
-
 output "rds_instance_security_group_id" {
   description = "ID of the RDS instance security group"
   value       = try(aws_security_group.rds.id, null)

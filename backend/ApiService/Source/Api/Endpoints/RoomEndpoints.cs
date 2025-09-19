@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
-using Epam.ItMarathon.ApiService.Api.Dto.CreationDtos;
+using Epam.ItMarathon.ApiService.Api.Dto.ReadDtos;
 using Epam.ItMarathon.ApiService.Api.Dto.Requests.RoomRequests;
 using Epam.ItMarathon.ApiService.Api.Dto.Responses.RoomResponses;
+using Epam.ItMarathon.ApiService.Api.Endpoints.Extension;
 using Epam.ItMarathon.ApiService.Api.Endpoints.Extension.SwaggerTagExtension;
 using Epam.ItMarathon.ApiService.Api.Filters.Validation;
 using Epam.ItMarathon.ApiService.Application.Models.Creation;
 using Epam.ItMarathon.ApiService.Application.UseCases.RoomCases.Commands;
+using Epam.ItMarathon.ApiService.Application.UseCases.RoomCases.Queries;
 using MediatR;
 
 namespace Epam.ItMarathon.ApiService.Api.Endpoints
@@ -32,20 +34,43 @@ namespace Epam.ItMarathon.ApiService.Api.Endpoints
                 .WithSummary("Create room for prize draw.")
                 .WithDescription("Return created room info.");
 
+            _ = root.MapGet("", GetRoomRequest)
+                .AddEndpointFilterFactory(ValidationFactoryFilter.GetValidationFactory)
+                .Produces<RoomReadDto>(StatusCodes.Status200OK)
+                .ProducesProblem(StatusCodes.Status400BadRequest)
+                .ProducesProblem(StatusCodes.Status404NotFound)
+                .ProducesProblem(StatusCodes.Status500InternalServerError)
+                .WithSummary("Read room info by User code or Room code.")
+                .WithDescription("Return room info.");
+
             return app;
         }
 
         public static Task<IResult> CreateRoomRequest([Validate] RoomCreationRequest request, IMediator mediator, IMapper mapper)
         {
             var result = mediator.Send(new CreateRoomCommand(mapper.Map<RoomApplication>(request.Room), 
-                mapper.Map<UserApplication>(request.Admin))).Result;
+                mapper.Map<UserApplication>(request.AdminUser))).Result;
             if (result.IsFailure)
-                return Task.FromResult(Results.ValidationProblem(result.Error.ToDictionary()));
+            {
+                return Task.FromResult(result.Error.ValidationProblem());
+            }
+
             return Task.FromResult(Results.Created(string.Empty, new RoomCreationResponse()
             {
-                Room = mapper.Map<RoomDto>(result.Value),
+                Room = mapper.Map<RoomReadDto>(result.Value),
                 UserCode = result.Value.Users.Where(user => user.IsAdmin).First().AuthCode
             }));
+        }
+
+        public static Task<IResult> GetRoomRequest([AsParameters] [Validate] RoomReadingRequest request, IMediator mediator, IMapper mapper)
+        {
+            var result = mediator.Send(new GetRoomQuery(request.UserCode, request.RoomCode)).Result;
+            if (result.IsFailure)
+            {
+                return Task.FromResult(result.Error.ValidationProblem());
+            }
+
+            return Task.FromResult(Results.Ok(mapper.Map<RoomReadDto>(result.Value)));
         }
     }
 }

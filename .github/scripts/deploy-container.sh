@@ -2,14 +2,16 @@
 set -e
 
 # Checking all env variables
-for var in REPO MICROSERVICE_NAME IMAGE_TAG INSTANCE_ID CONTAINER_NAME PORT DOCKER_USERNAME DOCKER_PASSWORD; do
+variables=("REPO" "MICROSERVICE_NAME" "IMAGE_TAG" "INSTANCE_ID" "CONTAINER_NAME" "PORT" "DOCKER_USERNAME" "DOCKER_PASSWORD")
+
+for var in "${variables[@]}"; do
   if [ -z "${!var}" ]; then
     echo "::error::Missing required environment variable: $var"
     exit 1
   fi
 done
 
-IMAGE_NAME="${DOCKER_USERNAME}${REPO}:${IMAGE_TAG}"
+IMAGE_NAME="${REPO}:${IMAGE_TAG}"
 echo "Using Docker image: ${IMAGE_NAME}"
 
 
@@ -81,7 +83,8 @@ if [[ "$MICROSERVICE_NAME" == "dotnet" ]]; then
 
 elif [[ "$MICROSERVICE_NAME" == "angular" || "$MICROSERVICE_NAME" == "react" ]]; then
   echo "Setting environment variables for frontend service (${MICROSERVICE_NAME})..."
-  EXTRA_ENV="-e API_URL=https://api.example.com"
+
+  EXTRA_ENV="-e API_URL=http://backend"
   echo "Using EXTRA_ENV for frontend: ${EXTRA_ENV}"
 
 else

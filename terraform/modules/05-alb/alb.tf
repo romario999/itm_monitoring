@@ -58,52 +58,6 @@ resource "aws_lb_target_group" "web_ui_angular" {
   )
 }
 
-resource "aws_lb_target_group" "grafana" {
-  name        = "${var.name}-grafana"
-  port        = var.grafana_port
-  protocol    = "HTTP"
-  vpc_id      = var.vpc_id
-  target_type = "instance"
-
-  health_check {
-    path                = "/"
-    protocol            = "HTTP"
-    matcher             = "200-399"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-  }
-  
-  tags = merge(
-    var.tags,
-    { "Name" = "${var.name}-grafana" }
-  )
-}
-
-resource "aws_lb_target_group" "prometheus" {
-  name        = "${var.name}-prometheus"
-  port        = var.prometheus_port
-  protocol    = "HTTP"
-  vpc_id      = var.vpc_id
-  target_type = "instance"
-
-  health_check {
-    path                = "/"
-    protocol            = "HTTP"
-    matcher             = "200-399"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-  }
-
-  tags = merge(
-    var.tags,
-    { "Name" = "${var.name}-prometheus" }
-  )
-}
-
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.this.arn
   port              = 80
@@ -127,38 +81,6 @@ resource "aws_lb_listener_rule" "angular_path" {
   condition {
     path_pattern {
       values = ["/angular*"]
-    }
-  }
-}
-
-resource "aws_lb_listener_rule" "grafana_path" {
-  listener_arn = aws_lb_listener.http.arn
-  priority     = 101
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.grafana.arn
-  }
-
-  condition {
-    path_pattern {
-      values = ["/grafana*"]
-    }
-  }
-}
-
-resource "aws_lb_listener_rule" "prometheus_path" {
-  listener_arn = aws_lb_listener.http.arn
-  priority     = 102
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.prometheus.arn
-  }
-
-  condition {
-    path_pattern {
-      values = ["/prometheus*"]
     }
   }
 }

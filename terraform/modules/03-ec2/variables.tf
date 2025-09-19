@@ -130,18 +130,6 @@ variable "web_backend_port" {
   default     = 8080
 }
 
-variable "prometheus_port" {
-  description = "Port for Prometheus service"
-  type        = number
-  default     = 9090
-}
-
-variable "grafana_port" {
-  description = "Port for Grafana service"
-  type        = number
-  default     = 3001
-}
-
 variable "port" {
   description = "Port for the service"
   type        = number
