@@ -2,8 +2,13 @@ FROM prom/prometheus:latest
 
 COPY prometheus.yml /etc/prometheus/prometheus.yml
 
+COPY nginx.conf /etc/nginx/nginx.conf
+
 VOLUME [ "/prometheus" ]
 
-EXPOSE 9090
+EXPOSE 9090 80
 
-CMD [ "--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus", "--web.route-prefix=/prometheus" ]
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+CMD ["/start.sh"]
