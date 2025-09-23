@@ -35,10 +35,13 @@ if [[ "$MICROSERVICE_NAME" == "dotnet" ]]; then
   EXTRA_ENV="-e ASPNETCORE_ENVIRONMENT=Development -e ConnectionStrings__DbConnectionString=\"$CONNECTIONSTRING\""
 elif [[ "$MICROSERVICE_NAME" == "angular" || "$MICROSERVICE_NAME" == "react" ]]; then
   EXTRA_ENV="-e API_URL=http://backend"
+elif [[ "$MICROSERVICE_NAME" == "prometheus" || "$MICROSERVICE_NAME" == "grafana" ]]; then
+  EXTRA_ENV=""  # для Prometheus та Grafana додаткові env змінні не потрібні
 else
   echo "::error::Unknown MICROSERVICE_NAME: ${MICROSERVICE_NAME}"
   exit 1
 fi
+
 
 # Deploy main container via SSM
 # Deploy main container via SSM
