@@ -107,7 +107,7 @@ resource "aws_lb_target_group_attachment" "this" {
 
   target_group_arn = var.target_group_arn
   target_id        = aws_instance.this.id
-  port             = local.ec2_ports_map[var.ec2_name][0]
+  port             = var.port
 
   depends_on = [aws_instance.this]
 }
