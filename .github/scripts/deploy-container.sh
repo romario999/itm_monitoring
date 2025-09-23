@@ -2,7 +2,7 @@
 set -e
 
 # Checking all env variables
-variables=("REPO" "MICROSERVICE_NAME" "IMAGE_TAG" "INSTANCE_ID" "CONTAINER_NAME" "PORT" "DOCKER_USERNAME" "DOCKER_PASSWORD")
+variables=("REPO" "MICROSERVICE_NAME" "IMAGE_TAG" "INSTANCE_ID" "CONTAINER_NAME" "DOCKER_USERNAME" "DOCKER_PASSWORD")
 
 for var in "${variables[@]}"; do
   if [ -z "${!var}" ]; then
@@ -11,9 +11,18 @@ for var in "${variables[@]}"; do
   fi
 done
 
+# Default port
+PORT=80
+
+# Override port for Prometheus and Grafana
+if [[ "$MICROSERVICE_NAME" == "prometheus" ]]; then
+  PORT=9090
+elif [[ "$MICROSERVICE_NAME" == "grafana" ]]; then
+  PORT=3001
+fi
+
 IMAGE_NAME="${REPO}:${IMAGE_TAG}"
 echo "Using Docker image: ${IMAGE_NAME}"
-
 
 EXTRA_ENV=""
 DB_PORT=${DB_PORT:-5432}
@@ -36,14 +45,12 @@ if [[ "$MICROSERVICE_NAME" == "dotnet" ]]; then
 elif [[ "$MICROSERVICE_NAME" == "angular" || "$MICROSERVICE_NAME" == "react" ]]; then
   EXTRA_ENV="-e API_URL=http://backend"
 elif [[ "$MICROSERVICE_NAME" == "prometheus" || "$MICROSERVICE_NAME" == "grafana" ]]; then
-  EXTRA_ENV=""  # для Prometheus та Grafana додаткові env змінні не потрібні
+  EXTRA_ENV=""
 else
   echo "::error::Unknown MICROSERVICE_NAME: ${MICROSERVICE_NAME}"
   exit 1
 fi
 
-
-# Deploy main container via SSM
 # Deploy main container via SSM
 COMMAND_ID=$(aws ssm send-command \
   --instance-ids "${INSTANCE_ID}" \
@@ -55,7 +62,7 @@ COMMAND_ID=$(aws ssm send-command \
     'docker container rm -f ${CONTAINER_NAME} || true',
     'docker image prune -f',
     'docker pull ${IMAGE_NAME}',
-    'docker run -d --name ${CONTAINER_NAME} -p 80:${PORT} ${EXTRA_ENV} --restart always ${IMAGE_NAME}',
+    'docker run -d --name ${CONTAINER_NAME} -p ${PORT}:${PORT} ${EXTRA_ENV} --restart always ${IMAGE_NAME}',
     'docker ps -f name=${CONTAINER_NAME}',
     'sleep 3',
     'docker logs ${CONTAINER_NAME} --tail 20',
