@@ -58,7 +58,7 @@ COMMAND_ID=$(aws ssm send-command \
 
     'docker container rm -f monitoring-exporter || true',
     'docker pull prom/node-exporter:latest',
-    'docker run -d --name monitoring-exporter --restart always -p 9100:9100 --pid=host --net=host prom/node-exporter:latest',
+    'docker run -d --name monitoring-exporter --restart always -p 9100:9100 prom/node-exporter:latest',
     'echo \"Monitoring exporter started: monitoring-exporter on port 9100\"'
   ]" \
   --query "Command.CommandId" \
