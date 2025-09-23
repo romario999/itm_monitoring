@@ -55,8 +55,7 @@ COMMAND_ID=$(aws ssm send-command \
     'docker ps -f name=${CONTAINER_NAME}',
     'sleep 3',
     'docker logs ${CONTAINER_NAME} --tail 20',
-
-    '[[ "$MICROSERVICE_NAME" != "grafana" && "$MICROSERVICE_NAME" != "prometheus" ]] && docker container rm -f monitoring-exporter || true && docker pull prom/node-exporter:latest && docker run -d --name monitoring-exporter --restart always -p 9100:9100 prom/node-exporter:latest && echo "Monitoring exporter started on port 9100"'
+    'if [ "$MICROSERVICE_NAME" != "grafana" ] && [ "$MICROSERVICE_NAME" != "prometheus" ]; then docker container rm -f monitoring-exporter || true; docker pull prom/node-exporter:latest; docker run -d --name monitoring-exporter --restart always -p 9100:9100 prom/node-exporter:latest; echo "Monitoring exporter started on port 9100"; fi'
   ]" \
   --query "Command.CommandId" \
   --output text)
