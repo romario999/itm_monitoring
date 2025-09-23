@@ -58,32 +58,64 @@ resource "aws_lb_target_group" "web_ui_angular" {
   )
 }
 
-# resource "aws_lb_listener" "http" {
-#   load_balancer_arn = aws_lb.this.arn
-#   port              = 80
-#   protocol          = "HTTP"
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.this.arn
+  port              = 80
+  protocol          = "HTTP"
 
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.web_ui_react.arn
-#   }
-# }
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.web_ui_react.arn
+  }
+}
 
-# resource "aws_lb_listener_rule" "angular_path" {
-#   listener_arn = aws_lb_listener.http.arn
-#   priority     = 100
+resource "aws_lb_listener_rule" "angular_path" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 100
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.web_ui_angular.arn
-#   }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.web_ui_angular.arn
+  }
 
-#   condition {
-#     path_pattern {
-#       values = ["/angular*"]
-#     }
-#   }
-# }
+  condition {
+    path_pattern {
+      values = ["/angular*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "grafana_path" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 200
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.grafana.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/grafana*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "prometheus_path" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 300
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.prometheus.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/prometheus*"]
+    }
+  }
+}
 
 resource "aws_lb_target_group" "grafana" {
   name        = "${var.name}-grafana"
@@ -131,23 +163,23 @@ resource "aws_lb_target_group" "prometheus" {
   )
 }
 
-resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.this.arn
-  port              = 80
-  protocol          = "HTTP"
+# resource "aws_lb_listener" "http" {
+#   load_balancer_arn = aws_lb.this.arn
+#   port              = 80
+#   protocol          = "HTTP"
 
-  default_action {
-    type             = "forward"
+#   default_action {
+#     type             = "forward"
     
-    forward {
-      target_group {
-        arn  = aws_lb_target_group.web_ui_react.arn
-        weight = 50 # 50% to React
-      }
-      target_group {
-        arn  = aws_lb_target_group.web_ui_angular.arn
-        weight = 50 # 50% to Angular
-      }
-    }
-  }
-}
+#     forward {
+#       target_group {
+#         arn  = aws_lb_target_group.web_ui_react.arn
+#         weight = 50 # 50% to React
+#       }
+#       target_group {
+#         arn  = aws_lb_target_group.web_ui_angular.arn
+#         weight = 50 # 50% to Angular
+#       }
+#     }
+#   }
+# }

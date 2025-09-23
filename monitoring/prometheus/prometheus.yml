@@ -1,0 +1,37 @@
+global: 
+  scrape_interval: 60s
+
+scrape_configs:
+  - job_name: 'backend'
+    ec2_sd_configs:
+      - region: eu-central-1
+        port: 
+        filters:
+          - name: tag:Role
+            values: ['backend']
+
+  - job_name: 'react-frontend'
+    ec2_sd_configs:
+      - region: eu-central-1
+        port: 
+        filters:
+          - name: tag:Role
+            values: ['react']
+
+  - job_name: 'angular-frontend'
+    ec2_sd_configs:
+      - region: eu-central-1
+        port: 
+        filters:
+          - name: tag:Role
+            values: ['angular']
+
+  - job_name: 'database'
+    ec2_sd_configs:
+      - region: eu-central-1
+        # TODO: change port to postgres_exporter
+        port: 
+        # --------------------------------
+        filters:
+          - name: tag:Role
+            values: ['postgres-db']
