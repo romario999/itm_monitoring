@@ -112,7 +112,7 @@ resource "aws_lb_listener_rule" "prometheus_path" {
 
   condition {
     path_pattern {
-      values = ["/prometheus*"]
+      values = ["/prometheus/*"]
     }
   }
 }
@@ -148,7 +148,7 @@ resource "aws_lb_target_group" "prometheus" {
   target_type = "instance"
 
   health_check {
-    path                = "/metrics"
+    path                = "/prometheus/metrics"
     protocol            = "HTTP"
     matcher             = "200-399"
     interval            = 30
