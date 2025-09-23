@@ -1,0 +1,11 @@
+@use 'abstracts/mixins' as *;
+
+:host {
+  @include general-background;
+
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 48px;
+  padding: 64px 0px 80px 0px;
+}

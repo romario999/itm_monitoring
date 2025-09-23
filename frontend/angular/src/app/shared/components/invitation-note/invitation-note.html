@@ -1,0 +1,36 @@
+<section class="invitation-note" #popupHost>
+  <div class="invitation-note__actions">
+    @if (editable()) {
+      <app-icon-button
+        [iconName]="isEdit() ? iconSave : iconEdit"
+        [ariaLabel]="isEdit() ? ariaLabelSave : ariaLabelEdit"
+        (click)="toggleEdit()"
+      />
+    }
+    <app-icon-button
+      [iconName]="iconCopy"
+      [ariaLabel]="ariaLabelCopy"
+      (click)="copy()"
+    />
+  </div>
+
+  <div
+    class="invitation-note__card"
+    appCharCounter
+    [positionY]="charCounterPositionY"
+    [control]="control"
+  >
+    <textarea
+      #textarea
+      [formControl]="control"
+      [readonly]="!isEdit()"
+      [attr.maxlength]="maxLength() ?? 1000"
+      class="invitation-note__textarea"
+      aria-label="Invitation note text"
+    ></textarea>
+
+    <p class="invitation-note__link">
+      {{ invitationLink() }}
+    </p>
+  </div>
+</section>
