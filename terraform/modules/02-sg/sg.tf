@@ -144,9 +144,18 @@ resource "aws_security_group" "prometheus" {
   )
 }
 
-resource "aws_vpc_security_group_ingress_rule" "prometheus_from_grafana" {
+resource "aws_vpc_security_group_ingress_rule" "prometheus_from_alb" {
   security_group_id            = aws_security_group.prometheus.id
   referenced_security_group_id = aws_security_group.alb.id
+  from_port                    = var.prometheus_port
+  to_port                      = var.prometheus_port
+  ip_protocol                  = "tcp"
+  description                  = "Allow ALB to reach Prometheus"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "prometheus_from_grafana" {
+  security_group_id            = aws_security_group.prometheus.id
+  referenced_security_group_id = aws_security_group.grafana.id
   from_port                    = var.prometheus_port
   to_port                      = var.prometheus_port
   ip_protocol                  = "tcp"
