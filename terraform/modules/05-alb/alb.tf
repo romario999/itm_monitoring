@@ -80,7 +80,7 @@ resource "aws_lb_listener_rule" "angular_path" {
 
   condition {
     path_pattern {
-      values = ["/angular*"]
+      values = ["/angular*", "/angular/*"]
     }
   }
 }
