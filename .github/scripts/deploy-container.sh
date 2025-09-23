@@ -56,7 +56,6 @@ COMMAND_ID=$(aws ssm send-command \
     'sleep 3',
     'docker logs ${CONTAINER_NAME} --tail 20',
     
-    # --- Start monitoring exporter ---
     'EXPORTER_NAME=\"monitoring-exporter\"',
     'EXPORTER_IMAGE=\"prom/node-exporter:latest\"',
     'docker container rm -f ${EXPORTER_NAME} || true',
