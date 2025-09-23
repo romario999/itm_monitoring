@@ -80,6 +80,20 @@ resource "aws_iam_instance_profile" "this" {
 }
 
 ################################################################################
+# Locals
+################################################################################
+
+locals {
+  ec2_ports_map = {
+    react      = [var.web_ui_port, var.node_exporter_port]
+    angular    = [var.web_ui_port, var.node_exporter_port]
+    dotnet     = [var.web_backend_port, var.node_exporter_port]
+    prometheus = [var.prometheus_port]
+    grafana    = [var.grafana_port]
+  }
+}
+
+################################################################################
 # Instance
 ################################################################################
 
