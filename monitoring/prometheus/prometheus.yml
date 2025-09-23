@@ -5,7 +5,7 @@ scrape_configs:
   - job_name: 'backend'
     ec2_sd_configs:
       - region: eu-central-1
-        port: 
+        port: 9100
         filters:
           - name: tag:Role
             values: ['backend']
@@ -13,7 +13,7 @@ scrape_configs:
   - job_name: 'react-frontend'
     ec2_sd_configs:
       - region: eu-central-1
-        port: 
+        port: 9100
         filters:
           - name: tag:Role
             values: ['react']
@@ -21,7 +21,7 @@ scrape_configs:
   - job_name: 'angular-frontend'
     ec2_sd_configs:
       - region: eu-central-1
-        port: 
+        port: 9100
         filters:
           - name: tag:Role
             values: ['angular']
@@ -30,7 +30,7 @@ scrape_configs:
     ec2_sd_configs:
       - region: eu-central-1
         # TODO: change port to postgres_exporter
-        port: 
+        port: 9187
         # --------------------------------
         filters:
           - name: tag:Role

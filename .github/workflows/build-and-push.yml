@@ -6,7 +6,7 @@ on:
       microservice:
         type: string
         required: true
-        description: 'Target microservice (react, angular, dotnet)'
+        description: 'Target microservice (react, angular, dotnet, grafana, prometheus)'
 
   workflow_dispatch:
     inputs:
@@ -17,7 +17,9 @@ on:
         options:
           - react
           - angular
-          - dotnet                
+          - dotnet  
+          - grafana
+          - prometheus              
 jobs:
   build-and-push:
     runs-on: ubuntu-latest

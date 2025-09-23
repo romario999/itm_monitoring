@@ -2,7 +2,7 @@ name: "Set Deployment Variables"
 
 inputs:
   microservice:
-    description: "Target microservice (react, angular, dotnet)"
+    description: "Target microservice (react, angular, dotnet, grafana, prometheus)"
     required: true
 
   docker_hub_username:
@@ -51,3 +51,25 @@ runs:
         echo "CONTEXT=backend/ApiService" >> $GITHUB_ENV
         echo "DOCKERFILE=backend/ApiService/Dockerfile" >> $GITHUB_ENV
         echo "REPO=${{ inputs.docker_hub_username }}/dotnet" >> $GITHUB_ENV
+    
+    - name: Set Grafana Environment
+      if: ${{ inputs.microservice == 'grafana' }}
+      shell: bash
+      run: |
+        echo "PORT=3001" >> $GITHUB_ENV
+        echo "CONTAINER_NAME=grafana-app" >> $GITHUB_ENV
+        echo "INSTANCE_NAME=grafana" >> $GITHUB_ENV
+        echo "CONTEXT=monitoring/grafana" >> $GITHUB_ENV
+        echo "DOCKERFILE=monitoring/grafana/Dockerfile" >> $GITHUB_ENV
+        echo "REPO=${{ inputs.docker_hub_username }}/grafana" >> $GITHUB_ENV
+
+    - name: Set Prometheus Environment
+      if: ${{ inputs.microservice == 'prometheus' }}
+      shell: bash
+      run: |
+        echo "PORT=9090" >> $GITHUB_ENV
+        echo "CONTAINER_NAME=prometheus-app" >> $GITHUB_ENV
+        echo "INSTANCE_NAME=prometheus" >> $GITHUB_ENV
+        echo "CONTEXT=monitoring/prometheus" >> $GITHUB_ENV
+        echo "DOCKERFILE=monitoring/prometheus/Dockerfile" >> $GITHUB_ENV
+        echo "REPO=${{ inputs.docker_hub_username }}/prometheus" >> $GITHUB_ENV
