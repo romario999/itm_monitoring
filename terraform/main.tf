@@ -94,7 +94,6 @@ module "alb" {
   web_ui_port       = var.web_ui_port
   prometheus_port   = var.prometheus_port
   grafana_port      = var.grafana_port
-  node_exporter_port = var.node_exporter_port
 }
 
 
