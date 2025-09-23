@@ -38,6 +38,11 @@ variable "grafana_port" {
   type        = number
 }
 
+variable "node_exporter_port" {
+  description = "Port for Node Exporter service"
+  type        = number
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)

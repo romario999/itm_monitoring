@@ -74,6 +74,11 @@ variable "grafana_port" {
   type        = number
 }
 
+variable "node_exporter_port" {
+  description = "Port for Node Exporter service"
+  type        = number
+}
+
 variable "alb_ingress_ports" {
   description = "Ports to allow on ALB"
   type        = list(number)

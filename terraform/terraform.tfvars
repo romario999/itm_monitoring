@@ -50,6 +50,7 @@ web_backend_port  = 8080
 web_ui_port       = 80
 prometheus_port   = 9090
 grafana_port      = 3001
+node_exporter_port = 9100
 
 ################################################################################
 # EC2 configuration

@@ -99,6 +99,37 @@ resource "aws_vpc_security_group_egress_rule" "web_ui_egress" {
 }
 
 ################################################################################
+# Security Group for Node Exporter
+################################################################################
+
+resource "aws_security_group" "node_exporter" {
+  name        = "${var.name_prefix}-node-exporter-sg"
+  description = "Security group for Node Exporter on EC2 instances"
+  vpc_id      = var.vpc_id
+
+  tags = merge(
+    { Name = "${var.name_prefix}-node-exporter-sg" },
+    var.tags
+  )
+}
+
+resource "aws_vpc_security_group_ingress_rule" "node_exporter_from_prometheus" {
+  security_group_id            = aws_security_group.node_exporter.id
+  referenced_security_group_id = aws_security_group.prometheus.id
+  from_port                    = var.node_exporter_port
+  to_port                      = var.node_exporter_port
+  ip_protocol                  = "tcp"
+  description                  = "Allow Prometheus to scrape Node Exporter"
+}
+
+resource "aws_vpc_security_group_egress_rule" "node_exporter_egress" {
+  security_group_id = aws_security_group.node_exporter.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+  description       = "Allow all outbound traffic"
+}
+
+################################################################################
 # Security Group for Prometheus
 ################################################################################
 
