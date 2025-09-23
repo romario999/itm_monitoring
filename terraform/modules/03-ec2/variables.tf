@@ -142,6 +142,18 @@ variable "grafana_port" {
   default     = 3001
 }
 
+variable "node_exporter_port" {
+  description = "Port for Node Exporter service"
+  type        = number
+  default     = 9100
+}
+
+variable "ports" {
+  description = "List of ports that should be allowed on this EC2"
+  type        = list(number)
+  default     = []
+}
+
 variable "port" {
   description = "Port for the service"
   type        = number
