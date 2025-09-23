@@ -55,13 +55,11 @@ COMMAND_ID=$(aws ssm send-command \
     'docker ps -f name=${CONTAINER_NAME}',
     'sleep 3',
     'docker logs ${CONTAINER_NAME} --tail 20',
-    
-    'EXPORTER_NAME=\"monitoring-exporter\"',
-    'EXPORTER_IMAGE=\"prom/node-exporter:latest\"',
-    'docker container rm -f ${EXPORTER_NAME} || true',
-    'docker pull ${EXPORTER_IMAGE}',
-    'docker run -d --name ${EXPORTER_NAME} --restart always -p 9100:9100 --pid=host --net=host ${EXPORTER_IMAGE}',
-    'echo \"Monitoring exporter started: ${EXPORTER_NAME} on port 9100\"'
+
+    'docker container rm -f monitoring-exporter || true',
+    'docker pull prom/node-exporter:latest',
+    'docker run -d --name monitoring-exporter --restart always -p 9100:9100 --pid=host --net=host prom/node-exporter:latest',
+    'echo \"Monitoring exporter started: monitoring-exporter on port 9100\"'
   ]" \
   --query "Command.CommandId" \
   --output text)
