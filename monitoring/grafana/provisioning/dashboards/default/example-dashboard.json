@@ -35,8 +35,8 @@
       "title": "Frontend Requests (ALB, last 5m)",
       "targets": [
         {
-          "expr": "increase(aws_applicationelb_request_count_sum[5m])",
-          "legendFormat": "{{load_balancer}}",
+          "expr": "increase(aws_applicationelb_request_count_sum{target_group=~\"react-tg|angular-tg\"}[5m])",
+          "legendFormat": "{{target_group}}",
           "refId": "A"
         }
       ],
