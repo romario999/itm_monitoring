@@ -56,6 +56,13 @@ resource "aws_iam_role" "this" {
   tags = var.tags
 }
 
+resource "aws_iam_role_policy_attachment" "prometheus_ec2_discovery" {
+  count      = var.ec2_name == "prometheus" ? 1 : 0
+  role       = aws_iam_role.this[0].name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+}
+
+
 resource "aws_iam_role_policy_attachment" "this" {
   for_each = { for k, v in var.iam_role_policies : k => v if var.create_iam_instance_profile }
 

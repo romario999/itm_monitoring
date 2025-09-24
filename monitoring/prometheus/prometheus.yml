@@ -7,7 +7,7 @@ scrape_configs:
       - region: eu-central-1
         port: 9100
         filters:
-          - name: tag:Role
+          - name: tag:Name
             values: ['backend']
 
   - job_name: 'react-frontend'
@@ -15,7 +15,7 @@ scrape_configs:
       - region: eu-central-1
         port: 9100
         filters:
-          - name: tag:Role
+          - name: tag:Name
             values: ['react']
 
   - job_name: 'angular-frontend'
@@ -23,7 +23,7 @@ scrape_configs:
       - region: eu-central-1
         port: 9100
         filters:
-          - name: tag:Role
+          - name: tag:Name
             values: ['angular']
 
   - job_name: 'database'
@@ -33,5 +33,5 @@ scrape_configs:
         port: 9187
         # --------------------------------
         filters:
-          - name: tag:Role
+          - name: tag:Name
             values: ['postgres-db']
