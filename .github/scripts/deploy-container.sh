@@ -33,7 +33,7 @@ elif [[ "$MICROSERVICE_NAME" == "grafana" ]]; then
   fi
 
   # Pass Prometheus URL to Grafana container
-  EXTRA_ENV="-e PROMETHEUS_URL=http://$PROMETHEUS_IP:9090"
+  EXTRA_ENV="-e PROMETHEUS_URL=http://$PROMETHEUS_IP:9090/prometheus"
 fi
 
 # Set other microservice-specific ENV
