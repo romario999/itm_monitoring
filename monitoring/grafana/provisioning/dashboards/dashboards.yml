@@ -9,4 +9,4 @@ providers:
     isDefault: true
     editable: true
     options:
-      path: /etc/grafana/provisioning/dashboards/
+      path: /etc/grafana/provisioning/dashboards/default
