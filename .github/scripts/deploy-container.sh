@@ -13,18 +13,30 @@ done
 
 # Default port
 PORT=80
+EXTRA_ENV=""
 
-# Override port for Prometheus and Grafana
+# Override port and set specific ENV for Prometheus and Grafana
 if [[ "$MICROSERVICE_NAME" == "prometheus" ]]; then
   PORT=9090
 elif [[ "$MICROSERVICE_NAME" == "grafana" ]]; then
   PORT=3001
+
+  # Fetch Prometheus IP dynamically from AWS
+  PROMETHEUS_IP=$(aws ec2 describe-instances \
+    --filters "Name=tag:Name,Values=prometheus" \
+    --query "Reservations[*].Instances[*].PrivateIpAddress" \
+    --output text)
+
+  if [ -z "$PROMETHEUS_IP" ]; then
+    echo "::error::Cannot find Prometheus IP!"
+    exit 1
+  fi
+
+  # Pass Prometheus URL to Grafana container
+  EXTRA_ENV="-e PROMETHEUS_URL=http://$PROMETHEUS_IP:9090"
 fi
 
-IMAGE_NAME="${REPO}:${IMAGE_TAG}"
-echo "Using Docker image: ${IMAGE_NAME}"
-
-EXTRA_ENV=""
+# Set other microservice-specific ENV
 DB_PORT=${DB_PORT:-5432}
 
 if [[ "$MICROSERVICE_NAME" == "dotnet" ]]; then
@@ -45,7 +57,7 @@ if [[ "$MICROSERVICE_NAME" == "dotnet" ]]; then
 elif [[ "$MICROSERVICE_NAME" == "angular" || "$MICROSERVICE_NAME" == "react" ]]; then
   EXTRA_ENV="-e API_URL=http://backend"
 elif [[ "$MICROSERVICE_NAME" == "prometheus" || "$MICROSERVICE_NAME" == "grafana" ]]; then
-  EXTRA_ENV=""
+  :
 else
   echo "::error::Unknown MICROSERVICE_NAME: ${MICROSERVICE_NAME}"
   exit 1
@@ -61,8 +73,8 @@ COMMAND_ID=$(aws ssm send-command \
     'echo \"Deploying ${MICROSERVICE_NAME} container...\"',
     'docker container rm -f ${CONTAINER_NAME} || true',
     'docker image prune -f',
-    'docker pull ${IMAGE_NAME}',
-    'docker run -d --name ${CONTAINER_NAME} -p ${PORT}:${PORT} ${EXTRA_ENV} --restart always ${IMAGE_NAME}',
+    'docker pull ${REPO}:${IMAGE_TAG}',
+    'docker run -d --name ${CONTAINER_NAME} -p ${PORT}:${PORT} ${EXTRA_ENV} --restart always ${REPO}:${IMAGE_TAG}',
     'docker ps -f name=${CONTAINER_NAME}',
     'sleep 3',
     'docker logs ${CONTAINER_NAME} --tail 20',
