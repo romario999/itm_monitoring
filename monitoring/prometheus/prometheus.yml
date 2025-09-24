@@ -25,3 +25,11 @@ scrape_configs:
         filters:
           - name: tag:Name
             values: ['angular']
+    
+  - job_name: 'cloudwatch-exporter'
+    ec2_sd_configs:
+      - region: eu-central-1
+        port: 9106
+        filters:
+          - name: tag:Name
+            values: ['prometheus']
