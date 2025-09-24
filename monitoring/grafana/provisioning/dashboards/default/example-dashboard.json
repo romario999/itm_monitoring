@@ -32,10 +32,10 @@
     },
     {
       "type": "graph",
-      "title": "Frontend Requests (ALB)",
+      "title": "Frontend Requests (ALB, last 5m)",
       "targets": [
         {
-          "expr": "rate(aws_applicationelb_request_count_sum[5m])",
+          "expr": "increase(aws_applicationelb_request_count_sum[5m])",
           "legendFormat": "{{load_balancer}}",
           "refId": "A"
         }
