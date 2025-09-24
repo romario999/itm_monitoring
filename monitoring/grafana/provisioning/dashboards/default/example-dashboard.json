@@ -12,7 +12,7 @@
       "targets": [
         {
           "expr": "100 - (avg by(instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
-          "legendFormat": "{{instance}}",
+          "legendFormat": "{{instance_name}}",
           "refId": "A"
         }
       ],
@@ -28,7 +28,7 @@
       "targets": [
         {
           "expr": "100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes))",
-          "legendFormat": "{{instance}}",
+          "legendFormat": "{{instance_name}}",
           "refId": "A"
         }
       ],
