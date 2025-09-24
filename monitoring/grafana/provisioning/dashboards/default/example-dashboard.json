@@ -32,12 +32,17 @@
     },
     {
       "type": "graph",
-      "title": "Frontend Requests (ALB, last 5m)",
+      "title": "Frontend Requests (React vs Angular, last 5m)",
       "targets": [
         {
-          "expr": "increase(aws_applicationelb_request_count_sum{target_group=~\"react-tg|angular-tg\"}[5m])",
-          "legendFormat": "{{target_group}}",
+          "expr": "increase(aws_applicationelb_request_count_sum{load_balancer=~\".*react.*\"}[5m])",
+          "legendFormat": "React ALB",
           "refId": "A"
+        },
+        {
+          "expr": "increase(aws_applicationelb_request_count_sum{load_balancer=~\".*angular.*\"}[5m])",
+          "legendFormat": "Angular ALB",
+          "refId": "B"
         }
       ],
       "gridPos": { "x": 0, "y": 6, "w": 12, "h": 6 }
