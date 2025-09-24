@@ -125,7 +125,7 @@ EOT",
     --parameters 'commands=[
       "docker container rm -f cloudwatch-exporter || true",
       "docker pull prom/cloudwatch-exporter:latest",
-      "docker run -d --name cloudwatch-exporter -p 9106:9106 -v /home/ec2-user/cloudwatch-config.yml:/config.yml prom/cloudwatch-exporter:latest"
+      "docker run -d --name cloudwatch-exporter -p 9106:9106 -v /home/ec2-user/cloudwatch-config.yml:/config/config.yml prom/cloudwatch-exporter:latest"
     ]'
 
   echo "CloudWatch Exporter started on port 9106"
