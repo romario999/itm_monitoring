@@ -57,6 +57,16 @@ resource "aws_vpc_security_group_ingress_rule" "web_backend_from_web_ui" {
   description                  = "Allow API requests from Web UI to Web Backend"
 }
 
+resource "aws_vpc_security_group_ingress_rule" "web_backend_from_prometheus" {
+  security_group_id            = aws_security_group.web_backend.id
+  referenced_security_group_id = aws_security_group.prometheus.id
+  from_port                    = var.node_exporter_port
+  to_port                      = var.node_exporter_port
+  ip_protocol                  = "tcp"
+  description                  = "Allow Prometheus to scrape Web Backend metrics"
+}
+
+
 resource "aws_vpc_security_group_egress_rule" "web_backend_egress" {
   security_group_id = aws_security_group.web_backend.id
 

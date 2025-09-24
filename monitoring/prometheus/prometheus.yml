@@ -25,13 +25,3 @@ scrape_configs:
         filters:
           - name: tag:Name
             values: ['angular']
-
-  - job_name: 'database'
-    ec2_sd_configs:
-      - region: eu-central-1
-        # TODO: change port to postgres_exporter
-        port: 9187
-        # --------------------------------
-        filters:
-          - name: tag:Name
-            values: ['postgres-db']
