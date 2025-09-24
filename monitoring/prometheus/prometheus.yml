@@ -8,7 +8,7 @@ scrape_configs:
         port: 9100
         filters:
           - name: tag:Name
-            values: ['backend']
+            values: ['dotnet']
 
   - job_name: 'react-frontend'
     ec2_sd_configs:
