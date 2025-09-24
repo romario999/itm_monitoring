@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# Checking all env variables
+# --- Check required environment variables ---
 variables=("REPO" "MICROSERVICE_NAME" "IMAGE_TAG" "INSTANCE_ID" "CONTAINER_NAME" "DOCKER_USERNAME" "DOCKER_PASSWORD")
 
 for var in "${variables[@]}"; do
@@ -11,11 +11,11 @@ for var in "${variables[@]}"; do
   fi
 done
 
-# Default port
+# --- Default port ---
 PORT=80
 EXTRA_ENV=""
 
-# Override port and set specific ENV for Prometheus and Grafana
+# --- Override port and set specific ENV for Prometheus and Grafana ---
 if [[ "$MICROSERVICE_NAME" == "prometheus" ]]; then
   PORT=9090
 elif [[ "$MICROSERVICE_NAME" == "grafana" ]]; then
@@ -32,11 +32,10 @@ elif [[ "$MICROSERVICE_NAME" == "grafana" ]]; then
     exit 1
   fi
 
-  # Pass Prometheus URL to Grafana container
   EXTRA_ENV="-e PROMETHEUS_URL=http://$PROMETHEUS_IP:9090/prometheus"
 fi
 
-# Set other microservice-specific ENV
+# --- Other microservice-specific ENV ---
 DB_PORT=${DB_PORT:-5432}
 
 if [[ "$MICROSERVICE_NAME" == "dotnet" ]]; then
@@ -63,36 +62,85 @@ else
   exit 1
 fi
 
-# Deploy main container via SSM
+# --- Deploy main container via SSM ---
 COMMAND_ID=$(aws ssm send-command \
   --instance-ids "${INSTANCE_ID}" \
   --document-name "AWS-RunShellScript" \
   --parameters "commands=[
-    'echo \"Logging in to Docker registry...\"',
+    'echo Logging in to Docker registry...',
     'echo \"${DOCKER_PASSWORD}\" | docker login -u ${DOCKER_USERNAME} --password-stdin',
-    'echo \"Deploying ${MICROSERVICE_NAME} container...\"',
+    'echo Deploying ${MICROSERVICE_NAME} container...',
     'docker container rm -f ${CONTAINER_NAME} || true',
     'docker image prune -f',
     'docker pull ${REPO}:${IMAGE_TAG}',
     'docker run -d --name ${CONTAINER_NAME} -p ${PORT}:${PORT} ${EXTRA_ENV} --restart always ${REPO}:${IMAGE_TAG}',
     'docker ps -f name=${CONTAINER_NAME}',
     'sleep 3',
-    'docker logs ${CONTAINER_NAME} --tail 20',
-    'if [ \"$MICROSERVICE_NAME\" != \"grafana\" ] && [ \"$MICROSERVICE_NAME\" != \"prometheus\" ]; then',
-    'docker container rm -f monitoring-exporter || true',
-    'docker pull prom/node-exporter:latest',
-    'docker run -d --name monitoring-exporter --restart always -p 9100:9100 prom/node-exporter:latest',
-    'echo \"Monitoring exporter started on port 9100\"',
-    'fi'
+    'docker logs ${CONTAINER_NAME} --tail 20'
   ]" \
   --query "Command.CommandId" \
   --output text)
 
-sleep 5
+echo "Deployment initiated with Command ID: $COMMAND_ID"
 
-echo "Command ID: $COMMAND_ID"
-echo "Waiting for deployment to complete..."
+# --- PROMETHEUS SPECIFIC: CloudWatch Exporter ---
+if [[ "$MICROSERVICE_NAME" == "prometheus" ]]; then
+  echo "Setting up CloudWatch Exporter on Prometheus instance..."
 
+  # 1. Create cloudwatch-config.yml
+  aws ssm send-command \
+    --instance-ids "${INSTANCE_ID}" \
+    --document-name "AWS-RunShellScript" \
+    --parameters 'commands=[
+      "cat <<EOT > /home/ec2-user/cloudwatch-config.yml
+region: eu-central-1
+metrics:
+  - aws_namespace: AWS/EC2
+    aws_metric_name: CPUUtilization
+    aws_dimensions: [InstanceId]
+    aws_statistics: [Average]
+    period_seconds: 300
+    range_seconds: 600
+  - aws_namespace: AWS/ApplicationELB
+    aws_metric_name: RequestCount
+    aws_dimensions: [LoadBalancer]
+    aws_statistics: [Sum]
+    period_seconds: 300
+    range_seconds: 600
+  - aws_namespace: AWS/Billing
+    aws_metric_name: EstimatedCharges
+    aws_dimensions: [Currency]
+    aws_statistics: [Maximum]
+    period_seconds: 21600
+    range_seconds: 86400
+EOT",
+      "chown ec2-user:ec2-user /home/ec2-user/cloudwatch-config.yml",
+      "chmod 600 /home/ec2-user/cloudwatch-config.yml"
+    ]'
+
+  # 2. Run CloudWatch Exporter container
+  aws ssm send-command \
+    --instance-ids "${INSTANCE_ID}" \
+    --document-name "AWS-RunShellScript" \
+    --parameters 'commands=[
+      "docker container rm -f cloudwatch-exporter || true",
+      "docker pull prom/cloudwatch-exporter:latest",
+      "docker run -d --name cloudwatch-exporter -p 9106:9106 -v /home/ec2-user/cloudwatch-config.yml:/config/config.yml prom/cloudwatch-exporter:latest --config.file=/config/config.yml"
+    ]'
+
+  echo "CloudWatch Exporter started on port 9106"
+
+  # 3. Optional: check exporter health
+  sleep 5
+  HEALTH=$(aws ssm send-command \
+    --instance-ids "${INSTANCE_ID}" \
+    --document-name "AWS-RunShellScript" \
+    --parameters 'commands=["curl -s -o /dev/null -w \"%{http_code}\" http://localhost:9106/metrics"]' \
+    --query "Command.CommandId" --output text)
+  echo "CloudWatch Exporter health check Command ID: $HEALTH"
+fi
+
+# --- Wait for main container deployment to succeed ---
 for i in {1..12}; do
   STATUS=$(aws ssm get-command-invocation \
     --command-id "$COMMAND_ID" \
