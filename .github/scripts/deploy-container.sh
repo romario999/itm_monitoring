@@ -90,15 +90,16 @@ COMMAND_ID=$(aws ssm send-command \
 echo "Deployment initiated with Command ID: $COMMAND_ID"
 
 # --- PROMETHEUS SPECIFIC: CloudWatch Exporter ---
+# --- PROMETHEUS SPECIFIC: CloudWatch Exporter ---
 if [[ "$MICROSERVICE_NAME" == "prometheus" ]]; then
   echo "Setting up CloudWatch Exporter on Prometheus instance..."
 
-  # 1. Create cloudwatch-config.yml
+  # 1. Create cloudwatch-config for EC2 + ALB
   aws ssm send-command \
     --instance-ids "${INSTANCE_ID}" \
     --document-name "AWS-RunShellScript" \
     --parameters 'commands=[
-      "cat <<EOT > /home/ec2-user/cloudwatch-config.yml
+      "cat <<EOT > /home/ec2-user/cloudwatch-config-eu.yml
 region: eu-central-1
 metrics:
   - aws_namespace: AWS/EC2
@@ -113,6 +114,19 @@ metrics:
     aws_statistics: [Sum]
     period_seconds: 60
     range_seconds: 900
+EOT",
+      "chown ec2-user:ec2-user /home/ec2-user/cloudwatch-config-eu.yml",
+      "chmod 600 /home/ec2-user/cloudwatch-config-eu.yml"
+    ]'
+
+  # 2. Create cloudwatch-config for Billing
+  aws ssm send-command \
+    --instance-ids "${INSTANCE_ID}" \
+    --document-name "AWS-RunShellScript" \
+    --parameters 'commands=[
+      "cat <<EOT > /home/ec2-user/cloudwatch-config-billing.yml
+region: us-east-1
+metrics:
   - aws_namespace: AWS/Billing
     aws_metric_name: EstimatedCharges
     aws_dimensions: [Currency]
@@ -120,32 +134,25 @@ metrics:
     period_seconds: 21600
     range_seconds: 86400
 EOT",
-      "chown ec2-user:ec2-user /home/ec2-user/cloudwatch-config.yml",
-      "chmod 600 /home/ec2-user/cloudwatch-config.yml"
+      "chown ec2-user:ec2-user /home/ec2-user/cloudwatch-config-billing.yml",
+      "chmod 600 /home/ec2-user/cloudwatch-config-billing.yml"
     ]'
 
-
-  # 2. Run CloudWatch Exporter container
+  # 3. Run CloudWatch Exporter containers
   aws ssm send-command \
     --instance-ids "${INSTANCE_ID}" \
     --document-name "AWS-RunShellScript" \
     --parameters 'commands=[
-      "docker container rm -f cloudwatch-exporter || true",
+      "docker container rm -f cloudwatch-exporter-eu || true",
+      "docker container rm -f cloudwatch-exporter-billing || true",
       "docker pull prom/cloudwatch-exporter:latest",
-      "docker run -d --name cloudwatch-exporter -p 9106:9106 -v /home/ec2-user/cloudwatch-config.yml:/config/config.yml prom/cloudwatch-exporter:latest"
+      "docker run -d --name cloudwatch-exporter-eu -p 9106:9106 -v /home/ec2-user/cloudwatch-config-eu.yml:/config/config.yml prom/cloudwatch-exporter:latest",
+      "docker run -d --name cloudwatch-exporter-billing -p 9107:9106 -v /home/ec2-user/cloudwatch-config-billing.yml:/config/config.yml prom/cloudwatch-exporter:latest"
     ]'
 
-  echo "CloudWatch Exporter started on port 9106"
-
-  # 3. Optional: check exporter health
-  sleep 5
-  HEALTH=$(aws ssm send-command \
-    --instance-ids "${INSTANCE_ID}" \
-    --document-name "AWS-RunShellScript" \
-    --parameters 'commands=["curl -s -o /dev/null -w \"%{http_code}\" http://localhost:9106/metrics"]' \
-    --query "Command.CommandId" --output text)
-  echo "CloudWatch Exporter health check Command ID: $HEALTH"
+  echo "CloudWatch Exporters started on ports 9106 (EU) and 9107 (Billing)"
 fi
+
 
 # --- Wait for main container deployment to succeed ---
 for i in {1..12}; do
