@@ -99,15 +99,14 @@ if [[ "$MICROSERVICE_NAME" == "prometheus" ]]; then
     --document-name "AWS-RunShellScript" \
     --parameters 'commands=[
       "cat <<EOT > /home/ec2-user/cloudwatch-config.yml
+region: eu-central-1
 metrics:
-  # EC2 та ALB з eu-central-1
   - aws_namespace: AWS/EC2
     aws_metric_name: CPUUtilization
     aws_dimensions: [InstanceId]
     aws_statistics: [Average]
     period_seconds: 300
     range_seconds: 600
-    region: eu-central-1
 
   - aws_namespace: AWS/ApplicationELB
     aws_metric_name: RequestCount
@@ -115,22 +114,18 @@ metrics:
     aws_statistics: [Sum]
     period_seconds: 60
     range_seconds: 900
-    region: eu-central-1
 
-  # Billing метрики з us-east-1
   - aws_namespace: AWS/Billing
     aws_metric_name: EstimatedCharges
     aws_dimensions: [Currency]
     aws_statistics: [Maximum]
-    period_seconds: 60
-    range_seconds: 300
-    region: us-east-1
-
+    period_seconds: 21600
+    range_seconds: 86400
+    aws_region: us-east-1
 EOT",
       "chown ec2-user:ec2-user /home/ec2-user/cloudwatch-config.yml",
       "chmod 600 /home/ec2-user/cloudwatch-config.yml"
     ]'
-
 
   # 2. Run CloudWatch Exporter container
   aws ssm send-command \
