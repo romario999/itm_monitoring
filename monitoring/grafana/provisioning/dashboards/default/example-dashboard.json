@@ -60,7 +60,7 @@
       "targets": [
         {
           "expr": "aws_billing_estimated_charges_maximum{currency=\"USD\"}",
-          "legendFormat": "{{Currency}}",
+          "legendFormat": "{{currency}}",
           "refId": "A"
         }
       ],
