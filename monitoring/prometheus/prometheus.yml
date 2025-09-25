@@ -37,7 +37,7 @@ scrape_configs:
 
   - job_name: 'cloudwatch-exporter'
     ec2_sd_configs:
-      - region: eu-central-1
+      - region: us-east-1
         port: 9106
         filters:
           - name: tag:Name
