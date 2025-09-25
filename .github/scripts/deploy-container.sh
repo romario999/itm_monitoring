@@ -117,10 +117,12 @@ metrics:
 
   - aws_namespace: AWS/Billing
     aws_metric_name: EstimatedCharges
-    aws_dimensions: [ServiceName, Currency]
+    aws_dimensions: [Currency]
+    aws_dimension_select:
+      Currency: [USD]
     aws_statistics: [Maximum]
-    period_seconds: 2592000
-    range_seconds: 2592000
+    period_seconds: 86400
+    range_seconds: 86400
     delay_seconds: 600
     aws_region: us-east-1
 EOT",
