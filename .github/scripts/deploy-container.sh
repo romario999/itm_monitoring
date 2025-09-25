@@ -121,8 +121,8 @@ metrics:
     aws_dimension_select:
       Currency: [USD]
     aws_statistics: [Maximum]
-    period_seconds: 86400
-    range_seconds: 86400
+    period_seconds: 3600
+    range_seconds: 3600
     delay_seconds: 600
     aws_region: us-east-1
 EOT",
