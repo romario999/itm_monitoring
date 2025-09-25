@@ -111,8 +111,8 @@ metrics:
     aws_metric_name: RequestCount
     aws_dimensions: [LoadBalancer]
     aws_statistics: [Sum]
-    period_seconds: 60
-    range_seconds: 600
+    period_seconds: 300
+    range_seconds: 900
   - aws_namespace: AWS/Billing
     aws_metric_name: EstimatedCharges
     aws_dimensions: [Currency]
