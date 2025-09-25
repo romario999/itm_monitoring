@@ -107,12 +107,15 @@ metrics:
     aws_statistics: [Sum]
     period_seconds: 300
     range_seconds: 600
-  - aws_namespace: AWS/Billing
-    aws_metric_name: EstimatedCharges
-    aws_dimensions: [Currency]
-    aws_statistics: [Maximum]
-    period_seconds: 21600
-    range_seconds: 86400
+
+- region: us-east-1
+  metrics:
+    - aws_namespace: AWS/Billing
+      aws_metric_name: EstimatedCharges
+      aws_dimensions: [Currency]
+      aws_statistics: [Maximum]
+      period_seconds: 21600
+      range_seconds: 86400
 EOT",
       "chown ec2-user:ec2-user /home/ec2-user/cloudwatch-config.yml",
       "chmod 600 /home/ec2-user/cloudwatch-config.yml"

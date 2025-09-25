@@ -59,7 +59,7 @@
       "title": "Infrastructure Costs (USD)",
       "targets": [
         {
-          "expr": "aws_billing_estimated_charges",
+          "expr": "aws_billing_estimatedcharges_maximum{Currency=\"USD\"}",
           "legendFormat": "{{Currency}}",
           "refId": "A"
         }
