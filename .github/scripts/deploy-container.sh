@@ -99,7 +99,7 @@ if [[ "$MICROSERVICE_NAME" == "prometheus" ]]; then
     --document-name "AWS-RunShellScript" \
     --parameters 'commands=[
       "cat <<EOT > /home/ec2-user/cloudwatch-config.yml
-region: eu-central-1
+region: us-east-1
 metrics:
   - aws_namespace: AWS/EC2
     aws_metric_name: CPUUtilization
