@@ -36,15 +36,9 @@ scrape_configs:
         target_label: instance_name
 
   - job_name: 'cloudwatch-exporter'
-    ec2_sd_configs:
-      - region: eu-central-1
-        port: 9106
-        filters:
-          - name: tag:Name
-            values: ['prometheus']
+    static_configs:
+      - targets: ['127.0.0.1:9106']  # або приватний IP інстансу
     relabel_configs:
-      - source_labels: [__meta_ec2_tag_Name]
-        target_label: instance_name
       - source_labels: [__address__]
         target_label: instance
         replacement: cloudwatch-exporter
