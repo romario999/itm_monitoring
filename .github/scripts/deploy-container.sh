@@ -76,7 +76,13 @@ COMMAND_ID=$(aws ssm send-command \
     'docker run -d --name ${CONTAINER_NAME} -p ${PORT}:${PORT} ${EXTRA_ENV} --restart always ${REPO}:${IMAGE_TAG}',
     'docker ps -f name=${CONTAINER_NAME}',
     'sleep 3',
-    'docker logs ${CONTAINER_NAME} --tail 20'
+    'docker logs ${CONTAINER_NAME} --tail 20',
+    'if [ \"$MICROSERVICE_NAME\" != \"grafana\" ] && [ \"$MICROSERVICE_NAME\" != \"prometheus\" ]; then',
+    'docker container rm -f monitoring-exporter || true',
+    'docker pull prom/node-exporter:latest',
+    'docker run -d --name monitoring-exporter --restart always -p 9100:9100 prom/node-exporter:latest',
+    'echo \"Monitoring exporter started on port 9100\"',
+    'fi'
   ]" \
   --query "Command.CommandId" \
   --output text)
@@ -108,14 +114,14 @@ metrics:
     period_seconds: 300
     range_seconds: 600
 
-- region: us-east-1
-  metrics:
-    - aws_namespace: AWS/Billing
-      aws_metric_name: EstimatedCharges
-      aws_dimensions: [Currency]
-      aws_statistics: [Maximum]
-      period_seconds: 21600
-      range_seconds: 86400
+region: us-east-1
+metrics:
+  - aws_namespace: AWS/Billing
+    aws_metric_name: EstimatedCharges
+    aws_dimensions: [Currency]
+    aws_statistics: [Maximum]
+    period_seconds: 21600
+    range_seconds: 86400
 EOT",
       "chown ec2-user:ec2-user /home/ec2-user/cloudwatch-config.yml",
       "chmod 600 /home/ec2-user/cloudwatch-config.yml"
