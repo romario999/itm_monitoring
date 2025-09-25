@@ -43,7 +43,7 @@
       "title": "Frontend Requests (ALB)",
       "targets": [
         {
-          "expr": "increase(aws_applicationelb_request_count_sum[5m])",
+          "expr": "round(increase(aws_applicationelb_request_count_sum[5m]))",
           "legendFormat": "{{load_balancer}}",
           "refId": "A"
         }
