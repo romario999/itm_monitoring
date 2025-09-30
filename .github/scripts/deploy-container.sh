@@ -114,20 +114,23 @@ metrics:
     aws_statistics: [Sum]
     period_seconds: 60
     range_seconds: 900
-
-  - aws_namespace: AWS/Billing
-    aws_metric_name: EstimatedCharges
-    aws_dimensions: [Currency]
-    aws_dimension_select:
-      Currency: [USD]
-    aws_statistics: [Maximum]
-    period_seconds: 3600
-    range_seconds: 86400
-    delay_seconds: 600
-    aws_region: us-east-1
 EOT",
       "chown ec2-user:ec2-user /home/ec2-user/cloudwatch-config.yml",
       "chmod 600 /home/ec2-user/cloudwatch-config.yml"
+    ],
+    [
+      "cat <<EOT > /home/ec2-user/cloudwatch-config-billing.yml
+region: us-east-1
+metrics:
+  - aws_namespace: AWS/Billing
+    aws_metric_name: EstimatedCharges
+    aws_dimensions: [Currency]
+    aws_statistics: [Maximum]
+    period_seconds: 21600
+    range_seconds: 43200
+EOT",
+      "chown ec2-user:ec2-user /home/ec2-user/cloudwatch-config-billing.yml",
+      "chmod 600 /home/ec2-user/cloudwatch-config-billing.yml"
     ]'
 
   # 2. Run CloudWatch Exporter container
@@ -137,7 +140,8 @@ EOT",
     --parameters 'commands=[
       "docker container rm -f cloudwatch-exporter || true",
       "docker pull prom/cloudwatch-exporter:latest",
-      "docker run -d --name cloudwatch-exporter -p 9106:9106 -v /home/ec2-user/cloudwatch-config.yml:/config/config.yml prom/cloudwatch-exporter:latest"
+      "docker run -d --name cloudwatch-exporter -p 9106:9106 -v /home/ec2-user/cloudwatch-config.yml:/config/config.yml prom/cloudwatch-exporter:latest",
+       "docker run -d --name cloudwatch-exporter-billing -p 9107:9106 -v /home/ec2-user/cloudwatch-config-billing.yml:/config/config.yml prom/cloudwatch-exporter:latest"
     ]'
 
   echo "CloudWatch Exporter started on port 9106"
