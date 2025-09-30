@@ -116,9 +116,7 @@ metrics:
     range_seconds: 900
 EOT",
       "chown ec2-user:ec2-user /home/ec2-user/cloudwatch-config.yml",
-      "chmod 600 /home/ec2-user/cloudwatch-config.yml"
-    ],
-    [
+      "chmod 600 /home/ec2-user/cloudwatch-config.yml",
       "cat <<EOT > /home/ec2-user/cloudwatch-config-billing.yml
 region: us-east-1
 metrics:
@@ -132,6 +130,7 @@ EOT",
       "chown ec2-user:ec2-user /home/ec2-user/cloudwatch-config-billing.yml",
       "chmod 600 /home/ec2-user/cloudwatch-config-billing.yml"
     ]'
+
 
   # 2. Run CloudWatch Exporter container
   aws ssm send-command \
