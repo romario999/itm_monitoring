@@ -124,7 +124,6 @@ metrics:
     aws_metric_name: EstimatedCharges
     aws_dimensions: [Currency]
     aws_statistics: [Maximum]
-    set_timestamp: false
     period_seconds: 60
     range_seconds: 300
 EOT",
