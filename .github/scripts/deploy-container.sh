@@ -119,12 +119,12 @@ EOT",
       "chmod 600 /home/ec2-user/cloudwatch-config.yml",
       "cat <<EOT > /home/ec2-user/cloudwatch-config-billing.yml
 region: us-east-1
-set_timestamp: false
 metrics:
   - aws_namespace: AWS/Billing
     aws_metric_name: EstimatedCharges
     aws_dimensions: [Currency]
     aws_statistics: [Maximum]
+    set_timestamp: false
     period_seconds: 60
     range_seconds: 300
 EOT",
