@@ -1,8 +1,7 @@
-name: Terraform AWS Deployment
+name: terraform AWS deployment
 run-name: ${{ inputs.action }} ${{ inputs.module }}
 
 on:
-  
   workflow_dispatch:
     inputs:
       module:
@@ -88,4 +87,12 @@ jobs:
               terraform destroy -auto-approve $TARGET
               ;;
           esac
-        shell: bash  
+        shell: bash
+
+  deploy:
+    if: ${{ env.MODULE == 'all' && env.ACTION == 'apply' }}
+    needs: terraform
+    uses: ./.github/workflows/auto-deploy.yml
+    with:
+      tag: latest
+    secrets: inherit
