@@ -37,9 +37,11 @@ import {
 import { Button } from '../../../shared/components/button/button';
 import { CharCounter } from '../../../core/directives/char-counter';
 import type {
+  BudgetControl,
   GiftIdeaFormType,
   SurpriseGiftFormType,
 } from '../../../app.models';
+import { FormValidation as CustomValidators } from '../../../core/services/form-validation';
 
 @Component({
   selector: 'app-add-your-wishes-form',
@@ -59,7 +61,7 @@ export class AddYourWishesForm implements OnInit, OnDestroy {
   readonly giftIdeaForm = input.required<FormGroup<GiftIdeaFormType>>();
   readonly surpriseGiftForm = input.required<FormGroup<SurpriseGiftFormType>>();
   readonly radioControl = input.required<FormControl<string>>();
-  readonly budgetControl = input.required<FormControl<number>>();
+  readonly budgetControl = input.required<FormControl<BudgetControl>>();
 
   readonly formCompleted = output<void>();
 
@@ -110,7 +112,13 @@ export class AddYourWishesForm implements OnInit, OnDestroy {
     this.giftIdeas.push(
       this.#formBuilder.group({
         name: [''],
-        infoLink: [''],
+        infoLink: [
+          '',
+          {
+            validators: [CustomValidators.safeUrl],
+            updateOn: 'blur',
+          },
+        ],
       })
     );
   }

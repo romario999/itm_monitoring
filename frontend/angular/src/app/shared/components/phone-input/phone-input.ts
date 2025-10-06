@@ -1,4 +1,10 @@
-import { Component, input } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  input,
+  ViewChild,
+} from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 import { InputSidebarText, InputPlaceholder, RegEx } from '../../../app.enum';
@@ -13,7 +19,9 @@ import { generateId } from '../../../utils/generate-id';
   templateUrl: './phone-input.html',
   styleUrl: './phone-input.scss',
 })
-export class PhoneInput {
+export class PhoneInput implements AfterViewInit {
+  @ViewChild(Input, { read: ElementRef })
+  private inputRef!: ElementRef<HTMLInputElement>;
   readonly control = input.required<FormControl>();
   readonly label = input.required<InputLabel>();
 
@@ -27,7 +35,12 @@ export class PhoneInput {
   public onInput(event: Event): void {
     this.#restrictInput(event);
   }
-
+  ngAfterViewInit(): void {
+    const el = this.inputRef.nativeElement.querySelector('input');
+    if (el) {
+      el.addEventListener('input', this.#restrictInput.bind(this), true);
+    }
+  }
   #restrictInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     const pattern = new RegExp(RegEx.Digits, 'g');

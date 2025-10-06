@@ -3,7 +3,7 @@ import { DatePicker, type DatePickerProps } from "antd";
 
 import FormWrapper from "../../common/form-wrapper/FormWrapper";
 import Input from "../../common/input/Input";
-import { InputNames, type FormData } from "./types";
+import { InputNames, type DateType, type FormData } from "./types";
 import {
   LABEL_DATE_PICKER,
   INPUT_ID_DATE_PICKER,
@@ -16,14 +16,13 @@ import {
 } from "../../../utils/validation";
 
 import styles from "../../common/input/Input.module.scss";
-import "./CreateRoomForm.scss";
 import { FormsContext } from "../../../contexts/forms-context/FormsContext";
+import "./CreateRoomForm.scss";
 
 const CreateRoomForm = () => {
-  const { onNextStep, createRoomData, setCreateRoomData } =
-    useContext(FormsContext);
+  const { onNextStep, roomData, setRoomData } = useContext(FormsContext);
   const { name, description, giftExchangeDate, giftMaximumBudget } =
-    createRoomData.room;
+    roomData.room;
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -32,7 +31,7 @@ const CreateRoomForm = () => {
 
     if (!isValidInputField(name, value)) return;
 
-    setCreateRoomData((prev) => ({
+    setRoomData((prev) => ({
       ...prev,
       room: {
         ...prev.room,
@@ -42,7 +41,7 @@ const CreateRoomForm = () => {
   };
 
   const handleDatePickerChange: DatePickerProps["onChange"] = (date) => {
-    setCreateRoomData((prev) => ({
+    setRoomData((prev) => ({
       ...prev,
       room: {
         ...prev.room,
@@ -57,8 +56,22 @@ const CreateRoomForm = () => {
     blockInvalidNumberKeys(e);
   };
 
+  const disablePastDates = (current: DateType) => {
+    if (!current) {
+      return false;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const currentDate = current.toDate();
+    currentDate.setHours(0, 0, 0, 0);
+
+    return currentDate < today;
+  };
+
   const isFormValid = isRequiredFieldsFilled<FormData>(
-    createRoomData?.room,
+    roomData?.room,
     requiredFields,
   );
 
@@ -104,6 +117,7 @@ const CreateRoomForm = () => {
             <DatePicker
               id={INPUT_ID_DATE_PICKER}
               format="DD-MM-YYYY"
+              disabledDate={disablePastDates}
               style={{
                 width: "338px",
               }}

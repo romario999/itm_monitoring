@@ -101,6 +101,25 @@
   }
 }
 
+@mixin button-small {
+  color: cm(small, default, text);
+  border-color: cm(small, default, border);
+
+  &:hover:not(:disabled) {
+    color: cm(small, hover, text);
+    border-color: cm(small, hover, border);
+  }
+
+  &:active:not(:disabled) {
+    color: cm(small, active, text);
+    border-color: cm(small, active, border);
+  }
+
+  &:focus-visible {
+    color: cm(small, active, text);
+  }
+}
+
 @mixin input-states(
   $border-hover: $input-color-border-hover,
   $border-focus: $input-color-border-focus,
@@ -134,9 +153,7 @@
     cursor: not-allowed;
   }
 
-  &[aria-invalid='true'],
-  &.ng-invalid.ng-touched,
-  &.ng-invalid.ng-dirty {
+  &.ng-invalid.ng-touched {
     border-color: $error-border !important;
   }
 }
@@ -168,9 +185,23 @@
     $page-bg no-repeat;
 }
 
+@mixin page-layout($padding: 64px 0 80px 0, $gap: 0) {
+  @include general-background;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $gap;
+  padding: $padding;
+}
+
 @mixin base-form-styles {
   &__input-control {
     margin-bottom: 20px;
+
+    &:has(.hint.hint--error) {
+      margin-bottom: 40px;
+    }
   }
 
   &__input-group {
@@ -185,4 +216,16 @@
   &__field-hint {
     position: absolute;
   }
+}
+
+@mixin multiline-truncate($lines) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $lines;
+  overflow: hidden;
+}
+
+@mixin heading($size, $height) {
+  font-size: $size;
+  line-height: $height;
 }

@@ -2,13 +2,14 @@ import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { ENDPOINT } from '../../app.enum';
+import { Endpoint } from '../../app.enum';
 import { BASE_URL } from './tokens/base-url.token';
 import {
   UserDetails,
   RoomCreationRequest,
   RoomSummary,
   RoomDetails,
+  UserProfile,
 } from '../../app.models';
 
 @Injectable({
@@ -22,18 +23,18 @@ export class ApiService {
     roomCreationData: RoomCreationRequest
   ): Observable<HttpResponse<RoomSummary>> {
     return this.#http.post<RoomSummary>(
-      `${this.#baseUrl}${ENDPOINT.rooms}`,
+      `${this.#baseUrl}${Endpoint.rooms}`,
       roomCreationData,
       { observe: 'response' }
     );
   }
 
-  public getRoomByCode(
+  public getRoomByRoomCode(
     roomCode: string
   ): Observable<HttpResponse<RoomDetails>> {
     const params = new HttpParams().set('roomCode', roomCode);
 
-    return this.#http.get<RoomDetails>(`${this.#baseUrl}${ENDPOINT.rooms}`, {
+    return this.#http.get<RoomDetails>(`${this.#baseUrl}${Endpoint.rooms}`, {
       params,
       observe: 'response',
     });
@@ -42,11 +43,11 @@ export class ApiService {
   public addUserToRoom(
     roomCode: string,
     userData: UserDetails
-  ): Observable<HttpResponse<UserDetails>> {
+  ): Observable<HttpResponse<UserProfile>> {
     const params = new HttpParams().set('roomCode', roomCode);
 
-    return this.#http.post<UserDetails>(
-      `${this.#baseUrl}${ENDPOINT.users}`,
+    return this.#http.post<UserProfile>(
+      `${this.#baseUrl}${Endpoint.users}`,
       userData,
       { params, observe: 'response' }
     );
@@ -57,7 +58,7 @@ export class ApiService {
   ): Observable<HttpResponse<RoomDetails>> {
     const params = new HttpParams().set('userCode', userCode);
 
-    return this.#http.get<RoomDetails>(`${this.#baseUrl}${ENDPOINT.rooms}`, {
+    return this.#http.get<RoomDetails>(`${this.#baseUrl}${Endpoint.rooms}`, {
       params,
       observe: 'response',
     });

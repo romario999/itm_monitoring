@@ -1,6 +1,8 @@
 import { ComponentRef } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
+import { UrlTree } from '@angular/router';
+
 import {
   BaseLabel,
   CaptionMessage,
@@ -35,11 +37,13 @@ export interface PopupInstance {
 
 export type StyleMap = Record<string, string>;
 
+export type BudgetControl = number | null;
+
 export interface CreateRoomFormType {
   name: FormControl<string>;
   description: FormControl<string>;
   giftExchangeDate: FormControl<string>;
-  giftMaximumBudget: FormControl<number>;
+  giftMaximumBudget: FormControl<BudgetControl>;
 }
 
 export interface AddYourDetailsFormType {
@@ -100,7 +104,6 @@ export interface RoomBase extends BasicRoomDetails {
   modifiedOn: string;
   adminId: number;
   invitationCode: string;
-  invitationLink: string;
   invitationNote: string;
 }
 
@@ -111,6 +114,37 @@ export interface RoomDetails extends RoomBase {
 
 export interface RoomSummary {
   room: RoomBase;
+  userCode: string;
+  userLink: string;
+}
+
+export interface CreateRoomSuccessPageData {
+  userCode: string;
+  invitationCode: string;
+  invitationNote: string;
+}
+
+export interface JoinRoomWelcomePageData {
+  giftMaximumBudget: number;
+  invitationCode: string;
+  giftExchangeDate: string;
+}
+
+export interface NavigationLinks {
+  absoluteUrl: string;
+  routerPath: string;
+}
+
+export type GuardReturnType = Observable<boolean | UrlTree> | boolean | UrlTree;
+
+export type CustomError = Record<string, boolean>;
+
+export interface UserProfile extends UserDetails {
+  id: number;
+  createdOn: string;
+  modifiedOn: string;
+  roomId: number;
+  isAdmin: boolean;
   userCode: string;
   userLink: string;
 }

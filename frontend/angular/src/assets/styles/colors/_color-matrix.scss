@@ -145,6 +145,23 @@ $btn-color-matrix: (
       border: $g-50,
     ),
   ),
+  small: (
+    default: (
+      text: $green-500,
+      border: $green-500,
+    ),
+    hover: (
+      text: $green-400,
+      border: $green-400,
+    ),
+    active: (
+      text: $green-700,
+      border: $green-700,
+    ),
+    focus: (
+      text: $green-400,
+    ),
+  ),
 ) !default;
 
 $header-bg: $g-50;
@@ -235,3 +252,21 @@ $copy-link-bg-light: rgba($copy-link-bg-dark, 0.6);
 $invitation-note-bg: $green-100;
 $invitation-note-border: $green-400;
 $invitation-note-link-color: $blue;
+
+$rdc-variants: (
+  light: (
+    border: $transparent,
+    background: $g-50,
+  ),
+  color: (
+    border: $green-400,
+    background: $green-100,
+  ),
+);
+
+$rdc-content-text: $g-700;
+
+$room-info-bg: $green-700;
+$room-info-text: $g-100;
+
+$room-info-card-text: $g-900;

@@ -3,7 +3,7 @@ export const enum Path {
   Success = 'success',
   CreateRoom = 'create-room',
   Join = 'join',
-  Dashboard = 'dashboard',
+  Room = 'room',
   NotFound = '**',
   Details = 'details',
 }
@@ -33,7 +33,7 @@ export const enum InputSidebarText {
 
 export const enum StepLabel {
   CreateRoom = 'Create room',
-  AddParticipantInfo = 'Add participant info',
+  AddPersonalInfo = 'Add personal info',
   AddWishlist = 'Add wishlist',
 }
 
@@ -92,12 +92,24 @@ export const enum TextareaLabel {
 
 export const enum CaptionMessage {
   EmptyMessage = '',
-  DontShare = 'Do not share this link with other users',
+  DoNotShare = 'Do not share this link with other users',
   BudgetExplanation = '0 means unlimited budget',
 }
 
 export enum ErrorMessage {
   DefaultMessage = '',
+  invalidPhone = 'Phone number must be 9 digits',
+  email = 'Please enter a valid email address',
+  unsafeUrl = 'Please enter a valid link format',
+}
+
+export enum ToastMessage {
+  DefaultMessage = '',
+  SomethingWentWrong = 'Something went wrong. Try again.',
+  UnavailableRoom = 'Room is unavailable or the link has expired',
+  FullRoom = 'This room is full already. Joining is not possible anymore',
+  PleaseCreateYourRoom = 'Please create your room first.',
+  PleaseJoinTheRoom = 'Please join the room first',
 }
 
 export const enum InputType {
@@ -134,6 +146,8 @@ export const enum ButtonText {
   BackToPrevStep = 'Back to the previous step',
   AddWish = 'Add Wish',
   Success = 'Visit Your Room',
+  WelcomeJoin = 'Join the Room',
+  InviteNewMembers = 'Invite New Members',
 }
 
 export const enum ButtonType {
@@ -146,6 +160,9 @@ export const enum PictureName {
   BigPresents = 'big-presents',
   Star = 'star',
   Flat = 'flat',
+  Letter = 'letter',
+  Firework = 'firework',
+  Star2 = 'star2',
 }
 
 export const enum FormTitle {
@@ -156,6 +173,15 @@ export const enum FormTitle {
 
 export const enum PageTitle {
   Success = 'Your Secret Nick Room is Ready!',
+  WelcomeJoin = 'Welcome to the Secret Squad!',
+  Home = 'Welcome to Secret Nick',
+  CreateRoom = 'Create Your Room',
+  CreateSuccess = 'Your Room is Ready!',
+  Welcome = 'Join the Room – Secret Nick',
+  JoinRoom = 'Fill in Your Info',
+  JoinSuccess = 'You’ve Joined the Room!',
+  Room = 'Your Room',
+  YouHaveJoinedTheRoom = 'You Have Joined the Room! 🎅',
 }
 
 export const enum FormSubtitle {
@@ -166,19 +192,14 @@ export const enum FormSubtitle {
 
 export const enum PageSubtitle {
   Success = 'Share the link below with up to 20 friends to invite them — and don’t lose your personal link! Let the festive magic begin!',
+  WelcomeJoin = `You've been invited to a cozy holiday gift exchange!Get ready to surprise and be surprised!`,
+  SuccessJoin = 'Your holiday adventure is about to begin! Thank you for joining the Secret Nick room.',
 }
 
 export const enum RegEx {
   Digits = '\\d+',
-}
-
-export const enum PageTitle {
-  Home = 'Welcome to Secret Nick',
-  CreateRoom = 'Create Your Room',
-  CreateSuccess = 'Your Room is Ready!',
-  Welcome = 'Join the Room – Secret Nick',
-  JoinRoom = 'Fill in Your Info',
-  JoinSuccess = 'You’ve Joined the Room!',
+  Phone = '^\\d{9}$',
+  SafeUrl = '^https://',
 }
 
 export const enum ItemPosition {
@@ -198,11 +219,31 @@ export const enum CopyLinkType {
 }
 
 export const enum InvitationNotePopup {
-  success = 'Invitation note is copied',
-  error = 'Invitation note was not copied. Try again.',
+  Success = 'Invitation note is copied',
+  Error = 'Invitation note was not copied. Try again.',
 }
 
-export const enum ENDPOINT {
-  rooms = 'api/rooms',
-  users = 'api/users',
+export const enum Endpoint {
+  rooms = '/api/rooms',
+  users = '/api/users',
+}
+
+export const enum NavigationLinkSegment {
+  Join = 'join',
+  Room = 'room',
+}
+
+export const enum RoomDataCardVariant {
+  Light = 'light',
+  Color = 'color',
+}
+
+export enum DateFormat {
+  Short = 'dd MMM yyyy',
+}
+
+export const enum RoomInfoCardTitle {
+  ExchangeDate = 'Exchange Date',
+  GiftBudget = 'Gift Budget',
+  InvitationNote = 'Invitation Note',
 }

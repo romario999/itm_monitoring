@@ -1,11 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
 import {
-  FormControl,
+  FormBuilder,
   FormGroup,
-  NonNullableFormBuilder,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
-
 import { Stepper } from '../shared/components/stepper/stepper';
 import { CreateRoomForm } from '../components/forms/create-room-form/create-room-form';
 import { StepperManager } from '../core/services/stepper-manager';
@@ -13,16 +12,12 @@ import { STEPPER_LABELS_TOKEN } from '../core/services/tokens/stepper-labels.tok
 import { CREATE_ROOM_STEPPER_LABELS } from '../app.constants';
 import { AddYourDetailsForm } from '../components/forms/add-your-details-form/add-your-details-form';
 import { AddYourWishesForm } from '../components/forms/add-your-wishes-form/add-your-wishes-form';
-import { RadioButtonValue } from '../app.enum';
+import { CreateRoomService } from './services/create-room';
+import { JoinRoom } from '../join-room/join-room';
 import type {
-  BasicUserDetails,
-  AddYourDetailsFormType,
   CreateRoomFormType,
-  GiftIdeaFormType,
-  WishListItem,
-  RoomCreationRequest,
-  SurpriseGiftFormType,
   BasicRoomDetails,
+  BudgetControl,
 } from '../app.models';
 
 @Component({
@@ -44,86 +39,56 @@ import type {
     StepperManager,
   ],
 })
-export class CreateRoom implements OnInit {
-  readonly #stepperManagerService = inject(StepperManager);
-  readonly #formBuilder = inject(NonNullableFormBuilder);
-
-  public readonly currentStep = this.#stepperManagerService.currentStep;
-  public readonly stepsCount = this.#stepperManagerService.maxSteps;
-  public readonly stepLabels = this.#stepperManagerService.labels;
-  public readonly radioControl = new FormControl();
+export class CreateRoom extends JoinRoom implements OnInit {
+  readonly #createRoomService = inject(CreateRoomService);
+  readonly #nullableFormBuilder = inject(FormBuilder);
 
   public createRoomForm!: FormGroup<CreateRoomFormType>;
-  public addYourDetailsForm!: FormGroup<AddYourDetailsFormType>;
-  public giftIdeaForm!: FormGroup<GiftIdeaFormType>;
-  public surpriseGiftForm!: FormGroup<SurpriseGiftFormType>;
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
     this.createRoomForm = this.#initCreateRoomForm();
-    this.addYourDetailsForm = this.#initAddYourDetailsForm();
-    this.giftIdeaForm = this.#initGiftIdeaForm();
-    this.surpriseGiftForm = this.#initSurpriseGiftForm();
+    this.giftMaximumBudget = this.createRoomForm.controls.giftMaximumBudget;
   }
 
-  public onFormCompleted(): void {
-    const combinedFormData: RoomCreationRequest = this.#combineFormData();
-    // TODO: add implementation of sending data to the backend
-  }
-
-  #combineFormData(): RoomCreationRequest {
-    const wantSurprise =
-      this.radioControl.value === RadioButtonValue.SurpriseGift;
-    const wishList = !wantSurprise
-      ? (this.giftIdeaForm.value.wishList as WishListItem[])
-      : [];
-    const interests = wantSurprise
-      ? (this.surpriseGiftForm.value.interests as string)
-      : '';
-
-    return {
+  public override onFormCompleted(): void {
+    const roomCreationData = {
       room: this.createRoomForm.value as BasicRoomDetails,
-      adminUser: {
-        ...(this.addYourDetailsForm.value as BasicUserDetails),
-        wantSurprise,
-        wishList,
-        interests,
-      },
+      adminUser: this.getUserDetails(),
     };
+    this.#createRoomService.processRoomCreation(roomCreationData);
   }
 
   #initCreateRoomForm(): FormGroup<CreateRoomFormType> {
-    return this.#formBuilder.group({
-      name: [''],
-      description: [''],
-      giftExchangeDate: [''],
-      giftMaximumBudget: [0],
-    });
-  }
-
-  #initAddYourDetailsForm(): FormGroup<AddYourDetailsFormType> {
-    return this.#formBuilder.group({
-      firstName: [''],
-      lastName: [''],
-      phone: [''],
-      email: [''],
-      deliveryInfo: [''],
-    });
-  }
-
-  #initGiftIdeaForm(): FormGroup<GiftIdeaFormType> {
-    return this.#formBuilder.group({
-      wishList: this.#formBuilder.array([
-        this.#formBuilder.group({
-          name: [''],
-          infoLink: [''],
-        }),
-      ]),
-    });
-  }
-
-  #initSurpriseGiftForm(): FormGroup<SurpriseGiftFormType> {
-    return this.#formBuilder.group({
-      interests: [''],
+    return this.formBuilder.group({
+      name: [
+        '',
+        {
+          validators: [Validators.required],
+          updateOn: 'blur',
+        },
+      ],
+      description: [
+        '',
+        {
+          validators: [Validators.required],
+          updateOn: 'blur',
+        },
+      ],
+      giftExchangeDate: [
+        '',
+        {
+          validators: [Validators.required],
+          updateOn: 'blur',
+        },
+      ],
+      giftMaximumBudget: this.#nullableFormBuilder.control<BudgetControl>(
+        null,
+        {
+          validators: [Validators.required],
+          updateOn: 'blur',
+        }
+      ),
     });
   }
 }

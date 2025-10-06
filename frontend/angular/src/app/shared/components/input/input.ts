@@ -21,4 +21,11 @@ export class Input {
   readonly isRequiredField = input<boolean>(false);
   readonly maxLength = input<number | null>(null);
   readonly ariaDescribedBy = input<string>();
+
+  get ariaInvalid(): 'true' | 'false' {
+    return (this.control().touched || this.control().dirty)
+      && this.control().invalid
+      ? 'true'
+      : 'false';
+  }
 }

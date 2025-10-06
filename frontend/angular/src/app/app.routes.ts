@@ -1,5 +1,10 @@
 import { Routes } from '@angular/router';
+
 import { PageTitle, Path } from './app.enum';
+import { CreateRoomService } from './create-room/services/create-room';
+import { welcomeGuard } from './core/guards/welcome-guard';
+import { createRoomSuccessCanActivateGuard } from './core/guards/create-room-success-can-activate-guard';
+import { joinRoomSuccessCanActivateGuard } from './core/guards/join-room-success-can-activate-guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: Path.Home, pathMatch: 'full' },
@@ -11,6 +16,7 @@ export const routes: Routes = [
   },
   {
     path: Path.CreateRoom,
+    providers: [CreateRoomService],
     children: [
       {
         path: '',
@@ -22,6 +28,7 @@ export const routes: Routes = [
       },
       {
         path: Path.Success,
+        canActivate: [createRoomSuccessCanActivateGuard],
         loadComponent: () =>
           import('./create-room/success').then(
             (component) => component.Success
@@ -32,6 +39,7 @@ export const routes: Routes = [
   },
   {
     path: `${Path.Join}/:roomId`,
+    canActivate: [welcomeGuard],
     children: [
       {
         path: '',
@@ -49,6 +57,7 @@ export const routes: Routes = [
       },
       {
         path: Path.Success,
+        canActivate: [joinRoomSuccessCanActivateGuard],
         loadComponent: () =>
           import('./join-room/success').then((component) => component.Success),
         title: PageTitle.JoinSuccess,
@@ -56,9 +65,10 @@ export const routes: Routes = [
     ],
   },
   {
-    path: Path.Dashboard,
+    path: `${Path.Room}/:userCode`,
     loadComponent: () =>
-      import('./dashboard/dashboard').then((component) => component.Dashboard),
+      import('./room/room').then((component) => component.Room),
+    title: PageTitle.Room,
   },
   {
     path: Path.NotFound,

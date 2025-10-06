@@ -11,19 +11,21 @@ import {
   PictureName,
 } from '../../../app.enum';
 import { StepperManager } from '../../../core/services/stepper-manager';
+import { BudgetPipe } from '../../pipes/budget.pipe';
+import { BudgetControl } from '../../../app.models';
 
 @Component({
   selector: 'app-form-layout',
   templateUrl: './form-layout.html',
   styleUrl: './form-layout.scss',
-  imports: [Button],
+  imports: [Button, BudgetPipe],
 })
 export class FormLayout {
   readonly title = input.required<FormTitle>();
   readonly subtitle = input.required<FormSubtitle>();
   readonly formPictureName = input.required<PictureName>();
 
-  readonly budget = input<number>(0);
+  readonly budget = input<BudgetControl>(0);
   readonly isFormValid = input<boolean>(false);
 
   readonly formCompleted = output<void>();
@@ -59,7 +61,8 @@ export class FormLayout {
     this.#stepperManagerService.handlePreviousStep();
   }
 
-  public onComplete(): void {
+  public onComplete(e: MouseEvent): void {
+    e.preventDefault();
     this.formCompleted.emit();
   }
 }
