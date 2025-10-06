@@ -89,12 +89,6 @@ jobs:
           esac
         shell: bash
 
-  build-and-push:
-    if: ${{ github.event.inputs.module == 'all' && github.event.inputs.action == 'apply' }}
-    needs: terraform
-    uses: ./.github/workflows/auto-build-and-push.yml
-    secrets: inherit
-
   deploy:
     if: ${{ github.event.inputs.module == 'all' && github.event.inputs.action == 'apply' }}
     needs: terraform

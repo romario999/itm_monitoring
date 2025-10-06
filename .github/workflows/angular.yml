@@ -1,4 +1,4 @@
-name: Angular CI/CD
+name: ci angular
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'frontend/angular/**'
-  pull_request:    
+  pull_request:   
     branches:
         - main
     paths:
@@ -15,27 +15,20 @@ on:
 jobs:
   test:
     if: github.event_name == 'push' || github.event_name == 'pull_request'
-    name: Run Tests for React
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-  # Build Docker Image for React
-  build:
-    if: github.event_name == 'push' 
-    name: Build React Docker Image
-    uses: ./.github/workflows/build-and-push.yml
+    name: Run Tests for Angular
+    uses: ./.github/workflows/test.yml
     with:
       microservice: angular
     secrets: inherit
 
-  # Deploy React Microservice
-  deploy:
-    if: github.event_name == 'push' 
-    name: Deploy React Microservice
-    needs: build
-    uses: ./.github/workflows/deploy-jobs.yml
+  # Build Docker Image for Angular
+  build:
+    if: github.event_name == 'push'
+    name: Build Angular Docker Image
+    permissions:
+      contents: read
+      pull-requests: read
+    uses: ./.github/workflows/build-and-push.yml
     with:
       microservice: angular
     secrets: inherit
